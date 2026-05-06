@@ -1,0 +1,4 @@
+/home/galih/Documents/Explore/belajar-cpp/Project3_S57_Parser/build/CMakeFiles/S57ParserApp.dir
+/home/galih/Documents/Explore/belajar-cpp/Project3_S57_Parser/build/CMakeFiles/GenerateS57Sample.dir
+/home/galih/Documents/Explore/belajar-cpp/Project3_S57_Parser/build/CMakeFiles/edit_cache.dir
+/home/galih/Documents/Explore/belajar-cpp/Project3_S57_Parser/build/CMakeFiles/rebuild_cache.dir

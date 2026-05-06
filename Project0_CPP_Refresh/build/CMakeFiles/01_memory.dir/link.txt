@@ -1,0 +1,1 @@
+/usr/bin/c++  -Wall -Wextra CMakeFiles/01_memory.dir/src/01_Memory_Management.cpp.o -o bin/01_memory 

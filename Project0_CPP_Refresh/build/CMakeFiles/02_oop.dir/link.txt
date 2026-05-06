@@ -1,0 +1,1 @@
+/usr/bin/c++  -Wall -Wextra CMakeFiles/02_oop.dir/src/02_OOP_Classes.cpp.o -o bin/02_oop 

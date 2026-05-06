@@ -1,0 +1,1 @@
+/usr/bin/c++  -Wall -Wextra CMakeFiles/03_stl.dir/src/03_STL_Containers.cpp.o -o bin/03_stl 
