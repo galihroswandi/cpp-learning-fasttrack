@@ -1,3 +1,0 @@
-Line 1: Hello dari C++ File I/O
-Line 2: Ini test file
-Line 3: Angka: 42 dan 3.14

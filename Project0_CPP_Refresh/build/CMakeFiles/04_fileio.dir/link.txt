@@ -1,1 +1,0 @@
-/usr/bin/c++  -Wall -Wextra -g CMakeFiles/04_fileio.dir/src/04_File_IO.cpp.o -o bin/04_fileio 

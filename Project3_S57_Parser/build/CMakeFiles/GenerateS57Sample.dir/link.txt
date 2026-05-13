@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/GenerateS57Sample.dir/src/GenerateSampleData.cpp.o CMakeFiles/GenerateS57Sample.dir/src/S57Parser.cpp.o -o GenerateS57Sample 

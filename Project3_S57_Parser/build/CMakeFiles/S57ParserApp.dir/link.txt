@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/S57ParserApp.dir/src/main.cpp.o CMakeFiles/S57ParserApp.dir/src/S57Parser.cpp.o -o S57ParserApp 
