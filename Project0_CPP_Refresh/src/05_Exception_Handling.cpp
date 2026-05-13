@@ -1,21 +1,52 @@
 /**
  * PROJECT 0 - Program 05: Exception Handling
- * 
- * This program demonstrates:
+ *
+ * Topik:
  * 1. Try-catch blocks
  * 2. Throwing exceptions
  * 3. Standard exception hierarchy
  * 4. Custom exception classes
- * 5. Exception safety guarantees
- * 6. RAII pattern for resource cleanup
- * 
- * Key concept: Gracefully handle errors without crashing
- * 
- * Compilation:
- *   g++ -std=c++17 -Wall -Wextra 05_Exception_Handling.cpp -o 05_exceptions
- * 
- * Run:
- *   ./05_exceptions
+ * 5. Exception safety dan RAII pattern
+ * 6. Best practices
+ *
+ * Build: cd build && cmake .. && make 05_exceptions
+ * Run:   ./build/bin/05_exceptions
+ */
+
+/**
+ * ============================================================
+ * UNTUK DEVELOPER JS/TS - BACA DULU!
+ * ============================================================
+ *
+ * KABAR BAIK: Exception handling di C++ SANGAT mirip dengan JS/TS!
+ *
+ * Padanan langsung:
+ *   JavaScript/TypeScript:          C++:
+ *   try {                           try {
+ *     throw new Error("msg");         throw runtime_error("msg");
+ *   }                               }
+ *   catch (e) {                     catch (const runtime_error& e) {
+ *     console.log(e.message);         cout << e.what();
+ *   }                               }
+ *   finally {                       // Tidak ada finally di C++!
+ *     cleanup();                    // Pakai destructor atau RAII
+ *   }
+ *
+ * PERBEDAAN dari JS/TS:
+ *   1. Catch HARUS spesifikan tipe exception: catch (const std::exception& e)
+ *      Di JS: catch (e) - catch semua tipe
+ *
+ *   2. Catch by REFERENCE: catch (const SomeError& e)
+ *      Di JS: catch (e) - tidak ada pilihan
+ *
+ *   3. Tidak ada `finally` keyword di C++!
+ *      Gantinya: destructor + RAII pattern (lebih elegant sebenarnya)
+ *
+ *   4. TypeScript bisa type exception: catch (e: Error) tidak benar-benar checked
+ *      C++: benar-benar type safe, salah tipe = tidak ke-catch
+ *
+ *   5. e.message di JS  →  e.what() di C++
+ * ============================================================
  */
 
 #include <iostream>
@@ -28,53 +59,68 @@ using namespace std;
 // ============================================================================
 // SECTION 1: Basic Try-Catch
 // ============================================================================
+//
+// Hampir identik dengan JS! Bedanya: harus tentukan tipe exception.
 
 void section1_BasicTryCatch() {
     cout << "\n" << string(60, '=') << endl;
-    cout << "SECTION 1: Basic Try-Catch Blocks" << endl;
+    cout << "SECTION 1: Basic Try-Catch (Mirip JS!)" << endl;
     cout << string(60, '=') << endl;
-    
-    cout << "\nDivision by zero without exception handling:" << endl;
-    cout << "  int result = 10 / 0;  // Undefined behavior!" << endl;
-    
-    cout << "\nWith exception handling:" << endl;
+
+    cout << "\nDi JS:" << endl;
+    cout << "  try {" << endl;
+    cout << "    throw new Error('Cannot divide by zero!');" << endl;
+    cout << "  } catch (e) {" << endl;
+    cout << "    console.log(e.message);" << endl;
+    cout << "  }" << endl;
+
+    cout << "\nDi C++ (hampir sama!):" << endl;
+    cout << "  try {" << endl;
+    cout << "    throw invalid_argument('Cannot divide by zero!');" << endl;
+    cout << "  } catch (const invalid_argument& e) {  // Harus spesifikan tipe" << endl;
+    cout << "    cout << e.what();" << endl;
+    cout << "  }" << endl;
+
+    cout << "\n--- Demo ---" << endl;
     try {
         int dividend = 10;
         int divisor = 0;
-        
+
         if (divisor == 0) {
-            throw invalid_argument("Cannot divide by zero!");
+            throw invalid_argument("Tidak bisa dibagi dengan nol!");
+            // Di JS: throw new Error("...")
         }
-        
+
         int result = dividend / divisor;
-        cout << "  Result: " << result << endl;
+        cout << "  Hasil: " << result << endl;
     }
     catch (const invalid_argument& e) {
-        cout << "  Caught exception: " << e.what() << endl;
-        cout << "  Program continues normally" << endl;
+        cout << "  Exception ditangkap: " << e.what() << endl;
+        // e.what() = e.message di JavaScript
+        cout << "  Program tetap jalan normal setelah catch" << endl;
     }
-    
-    cout << "\nKey concept:" << endl;
-    cout << "  try { } - code that might throw" << endl;
-    cout << "  catch (type e) { } - handle specific exception type" << endl;
 }
 
 // ============================================================================
 // SECTION 2: Multiple Catch Blocks
 // ============================================================================
+//
+// Di JS, catch (e) menangkap semua tipe.
+// Di C++, kamu bisa punya beberapa catch untuk tipe berbeda.
+// Urutan penting: tangkap yang lebih spesifik dulu!
 
 int safeDivide(int a, int b) {
     if (b == 0) {
-        throw invalid_argument("Divisor cannot be zero");
+        throw invalid_argument("Divisor tidak boleh nol");
     }
     return a / b;
 }
 
 string getString(int index) {
-    if (index < 0 || index > 5) {
-        throw out_of_range("Index out of range");
+    if (index < 0 || index > 4) {
+        throw out_of_range("Index di luar range valid (0-4)");
     }
-    string arr[] = {"one", "two", "three", "four", "five"};
+    string arr[] = {"satu", "dua", "tiga", "empat", "lima"};
     return arr[index];
 }
 
@@ -82,94 +128,123 @@ void section2_MultipleCatches() {
     cout << "\n" << string(60, '=') << endl;
     cout << "SECTION 2: Multiple Catch Blocks" << endl;
     cout << string(60, '=') << endl;
-    
-    cout << "\nTesting division (valid):" << endl;
+
+    // Di JS: catch (e) { if (e instanceof RangeError) {...} }
+    // Di C++: bisa langsung buat catch terpisah per tipe, lebih clean!
+
+    cout << "\nTest division valid:" << endl;
     try {
-        int result = safeDivide(10, 2);
-        cout << "  10 / 2 = " << result << endl;
+        cout << "  10 / 2 = " << safeDivide(10, 2) << endl;
     }
     catch (const invalid_argument& e) {
-        cout << "  Caught: " << e.what() << endl;
+        cout << "  Error: " << e.what() << endl;
     }
-    
-    cout << "\nTesting division (invalid):" << endl;
+
+    cout << "\nTest division by zero:" << endl;
     try {
-        int result = safeDivide(10, 0);
-        cout << "  10 / 0 = " << result << endl;
+        cout << "  10 / 0 = " << safeDivide(10, 0) << endl;
     }
     catch (const invalid_argument& e) {
-        cout << "  Caught: " << e.what() << endl;
+        cout << "  Tertangkap invalid_argument: " << e.what() << endl;
     }
-    
-    cout << "\nTesting array access (valid):" << endl;
+
+    cout << "\nTest array access valid:" << endl;
     try {
-        string s = getString(2);
-        cout << "  Index 2: " << s << endl;
+        cout << "  Index 2: " << getString(2) << endl;
     }
     catch (const out_of_range& e) {
-        cout << "  Caught: " << e.what() << endl;
+        cout << "  Error: " << e.what() << endl;
     }
-    
-    cout << "\nTesting array access (invalid):" << endl;
+
+    cout << "\nTest array access out of range:" << endl;
     try {
-        string s = getString(10);
-        cout << "  Index 10: " << s << endl;
+        cout << "  Index 10: " << getString(10) << endl;
     }
     catch (const out_of_range& e) {
-        cout << "  Caught: " << e.what() << endl;
+        cout << "  Tertangkap out_of_range: " << e.what() << endl;
     }
-    
-    cout << "\nCatching base exception class:" << endl;
+
+    cout << "\nCatch base class exception (menangkap semua turunan):" << endl;
+    cout << "(Di JS: catch (e) menangkap semuanya tanpa perlu hierarki)" << endl;
     try {
         safeDivide(5, 0);
     }
     catch (const exception& e) {
-        cout << "  Caught base exception: " << e.what() << endl;
-        cout << "  This catches ANY standard exception" << endl;
+        cout << "  Tertangkap sebagai exception: " << e.what() << endl;
+        cout << "  std::exception = catch-all untuk exception standard" << endl;
     }
 }
 
 // ============================================================================
 // SECTION 3: Standard Exception Hierarchy
 // ============================================================================
+//
+// Di JS, ada built-in Error types: Error, TypeError, RangeError, dll
+// Di C++, ada hierarki std::exception yang mirip
 
 void section3_ExceptionHierarchy() {
     cout << "\n" << string(60, '=') << endl;
-    cout << "SECTION 3: Standard Exception Hierarchy" << endl;
+    cout << "SECTION 3: Exception Hierarchy" << endl;
     cout << string(60, '=') << endl;
-    
-    cout << "\nC++ Standard Exception Hierarchy:" << endl;
-    cout << "\n  exception" << endl;
-    cout << "    ├─ logic_error" << endl;
-    cout << "    │  ├─ invalid_argument" << endl;
-    cout << "    │  ├─ out_of_range" << endl;
-    cout << "    │  └─ length_error" << endl;
-    cout << "    │" << endl;
-    cout << "    └─ runtime_error" << endl;
-    cout << "       ├─ range_error" << endl;
-    cout << "       ├─ overflow_error" << endl;
-    cout << "       └─ underflow_error" << endl;
-    
-    cout << "\nCommon exceptions:" << endl;
-    cout << "  invalid_argument - parameter is invalid" << endl;
-    cout << "  out_of_range - index/value out of valid range" << endl;
-    cout << "  runtime_error - unexpected runtime situation" << endl;
-    cout << "  logic_error - logic/design error" << endl;
+
+    cout << "\nPadanan JS Error types → C++ exceptions:" << endl;
+    cout << "\n  JS:                    C++:" << endl;
+    cout << "  Error                  std::exception" << endl;
+    cout << "  TypeError              std::invalid_argument" << endl;
+    cout << "  RangeError             std::out_of_range" << endl;
+    cout << "  (tidak ada padanan)    std::runtime_error" << endl;
+    cout << "  (tidak ada padanan)    std::logic_error" << endl;
+
+    cout << "\nHierarki C++ Exception:" << endl;
+    cout << "\n  exception  (base semua)" << endl;
+    cout << "    |" << endl;
+    cout << "    +-- logic_error  (bug logika programmer)" << endl;
+    cout << "    |     +-- invalid_argument  (parameter tidak valid)" << endl;
+    cout << "    |     +-- out_of_range      (index/nilai di luar range)" << endl;
+    cout << "    |     +-- length_error      (panjang tidak valid)" << endl;
+    cout << "    |" << endl;
+    cout << "    +-- runtime_error  (error saat runtime, tidak bisa diprediksi)" << endl;
+    cout << "          +-- range_error" << endl;
+    cout << "          +-- overflow_error" << endl;
+    cout << "          +-- underflow_error" << endl;
+
+    cout << "\nKapan pakai apa:" << endl;
+    cout << "  invalid_argument -> input tidak valid (mirip TypeError di JS)" << endl;
+    cout << "  out_of_range     -> index di luar batas (mirip RangeError di JS)" << endl;
+    cout << "  runtime_error    -> error yang tidak bisa dihindari saat runtime" << endl;
+    cout << "  logic_error      -> bug logika programmer" << endl;
 }
 
 // ============================================================================
 // SECTION 4: Custom Exception Classes
 // ============================================================================
+//
+// Di JS/TS:
+//   class AppError extends Error {
+//     constructor(message: string) { super(message); }
+//   }
+//
+// Di C++:
+//   class AppError : public exception {
+//     string message;
+//   public:
+//     AppError(const string& msg) : message(msg) {}
+//     const char* what() const noexcept override { return message.c_str(); }
+//   };
+//
+// Sangat mirip! Extend dari exception, implement what() (= message di JS)
 
 class FileException : public exception {
 private:
     string message;
-    
+
 public:
     FileException(const string& msg) : message(msg) {}
-    
+
+    // what() = e.message di JavaScript
+    // noexcept = garansi: method ini tidak akan throw exception
     const char* what() const noexcept override {
-        return message.c_str();
+        return message.c_str();  // c_str() = konversi string ke char* (C-style string)
     }
 };
 
@@ -177,14 +252,14 @@ class ValidationException : public exception {
 private:
     string field;
     string reason;
-    
+
 public:
-    ValidationException(const string& f, const string& r) 
+    ValidationException(const string& f, const string& r)
         : field(f), reason(r) {}
-    
+
     const char* what() const noexcept override {
-        static string msg;
-        msg = "Validation error in field '" + field + "': " + reason;
+        static string msg;  // static agar tidak di-destroy saat return
+        msg = "Validation error di field '" + field + "': " + reason;
         return msg.c_str();
     }
 };
@@ -192,92 +267,121 @@ public:
 void section4_CustomExceptions() {
     cout << "\n" << string(60, '=') << endl;
     cout << "SECTION 4: Custom Exception Classes" << endl;
+    cout << "(Sama seperti class extends Error di JS/TS!)" << endl;
     cout << string(60, '=') << endl;
-    
-    cout << "\nCustom exceptions allow domain-specific error handling:" << endl;
-    
-    // Example 1: File exception
-    cout << "\n[FileException]" << endl;
+
+    cout << "\nDi TypeScript:" << endl;
+    cout << "  class FileException extends Error { ... }" << endl;
+    cout << "\nDi C++:" << endl;
+    cout << "  class FileException : public exception { ... }" << endl;
+    cout << "  // Bedanya: implement what() bukan set message" << endl;
+
+    cout << "\n--- Demo FileException ---" << endl;
     try {
-        throw FileException("Could not open configuration file");
+        throw FileException("Tidak bisa membuka config.json");
+        // Di JS: throw new FileException("...")
     }
     catch (const FileException& e) {
-        cout << "  Caught FileException: " << e.what() << endl;
+        cout << "  Tertangkap: " << e.what() << endl;
+        // e.what() = e.message di JS
     }
-    
-    // Example 2: Validation exception
-    cout << "\n[ValidationException]" << endl;
+
+    cout << "\n--- Demo ValidationException ---" << endl;
     try {
-        string email = "invalid_email";
+        string email = "email_tanpa_at";
         if (email.find('@') == string::npos) {
-            throw ValidationException("email", "Missing @ symbol");
+            throw ValidationException("email", "Tidak ada @ symbol");
         }
     }
     catch (const ValidationException& e) {
-        cout << "  Caught ValidationException: " << e.what() << endl;
+        cout << "  Tertangkap: " << e.what() << endl;
     }
-    
-    // Example 3: Hierarchy
-    cout << "\n[Exception Hierarchy]" << endl;
-    cout << "Catching base exception catches all derived:" << endl;
+
+    cout << "\n--- Catch via base class ---" << endl;
+    cout << "(Di JS: catch (e) -> kalau e instanceof FileException...)" << endl;
     try {
-        throw FileException("General file error");
+        throw FileException("File error umum");
     }
     catch (const exception& e) {
-        cout << "  Caught as exception: " << e.what() << endl;
+        cout << "  Tertangkap sebagai exception: " << e.what() << endl;
+        cout << "  (Ini menangkap semua exception yang extends dari exception)" << endl;
     }
 }
 
 // ============================================================================
-// SECTION 5: Exception Safety - RAII Pattern
+// SECTION 5: RAII Pattern - Pengganti `finally` di C++
 // ============================================================================
+//
+// DI JS/TS, kamu pakai `finally` untuk cleanup:
+//   try {
+//     resource.open()
+//   } finally {
+//     resource.close()  // Pasti dijalankan walau ada exception
+//   }
+//
+// DI C++, tidak ada `finally`!
+// Gantinya pakai RAII: destructor OTOMATIS dipanggil saat keluar scope,
+// BAHKAN jika keluar karena exception!
+//
+// Ini sebenarnya lebih elegant karena cleanup terjadi otomatis,
+// tidak perlu ingat tulis finally.
 
 class Resource {
 private:
     int* buffer;
-    
+    string name;
+
 public:
-    Resource(int size) {
-        cout << "    [Allocating buffer of size " << size << "]" << endl;
+    Resource(const string& n, int size) : name(n) {
+        cout << "    [ALOKASI] " << name << " (size=" << size << ")" << endl;
         buffer = new int[size];
     }
-    
+
     ~Resource() {
-        cout << "    [Freeing buffer]" << endl;
+        cout << "    [CLEANUP] " << name << " otomatis dibersihkan" << endl;
         delete[] buffer;
     }
-    
-    void doSomething() {
-        cout << "    [Using resource]" << endl;
+
+    void doWork() {
+        cout << "    [KERJA] " << name << " sedang bekerja..." << endl;
     }
 };
 
 void section5_RAIIPattern() {
     cout << "\n" << string(60, '=') << endl;
-    cout << "SECTION 5: RAII - Resource Acquisition Is Initialization" << endl;
+    cout << "SECTION 5: RAII - Pengganti `finally` di C++" << endl;
     cout << string(60, '=') << endl;
-    
-    cout << "\nRAII principle:" << endl;
-    cout << "  - Resource allocated in constructor" << endl;
-    cout << "  - Resource freed in destructor" << endl;
-    cout << "  - Automatic cleanup even if exception occurs" << endl;
-    
-    cout << "\nExample - Resource with exception:" << endl;
+
+    cout << "\nDi JS/TS kamu pakai finally:" << endl;
+    cout << "  try { resource.open() }" << endl;
+    cout << "  finally { resource.close() }  // selalu dijalankan" << endl;
+
+    cout << "\nDi C++, destructor = finally otomatis:" << endl;
+    cout << "  {" << endl;
+    cout << "    Resource r(\"db\");  // Constructor = open" << endl;
+    cout << "    r.doWork();" << endl;
+    cout << "    // throw exception di sini pun..." << endl;
+    cout << "  }  // Destructor dipanggil otomatis di sini = finally!" << endl;
+
+    cout << "\n--- Demo: Exception tidak mencegah cleanup ---" << endl;
     try {
-        {
-            Resource r(100);  // Constructor runs
-            r.doSomething();
-            
-            // Exception thrown
-            throw runtime_error("Oops!");
-            
-            // Destructor still runs! (cleanup happens)
-        }
+        Resource r("NetworkConn", 100);  // Dibuat
+        r.doWork();
+
+        throw runtime_error("Terjadi error!");  // Exception dilempar
+
+        // Baris ini tidak pernah dicapai
     }
     catch (const exception& e) {
-        cout << "  Exception caught: " << e.what() << endl;
-        cout << "  But resource was cleaned up automatically!" << endl;
+        cout << "  Exception ditangkap: " << e.what() << endl;
+        cout << "  Tapi lihat: Resource sudah di-cleanup sebelum catch ini!" << endl;
     }
+
+    cout << "\nKenapa RAII lebih baik dari finally?" << endl;
+    cout << "  - Tidak perlu ingat nulis finally" << endl;
+    cout << "  - Cleanup terjadi OTOMATIS bahkan jika exception tidak di-catch" << endl;
+    cout << "  - Tidak bisa lupa tutup resource" << endl;
+    cout << "  - Nested cleanup tidak perlu nested try/finally" << endl;
 }
 
 // ============================================================================
@@ -286,74 +390,84 @@ void section5_RAIIPattern() {
 
 void section6_ExceptionGuarantees() {
     cout << "\n" << string(60, '=') << endl;
-    cout << "SECTION 6: Exception Safety Guarantees" << endl;
+    cout << "SECTION 6: Exception Safety Levels" << endl;
     cout << string(60, '=') << endl;
-    
-    cout << "\nException safety levels:" << endl;
-    
-    cout << "\n1. No-throw guarantee" << endl;
-    cout << "   - Function never throws" << endl;
-    cout << "   - Example: int doubleValue(int x) { return x * 2; }" << endl;
-    
-    cout << "\n2. Strong guarantee" << endl;
-    cout << "   - Either succeeds completely or has no effect" << endl;
-    cout << "   - 'All or nothing' - like database transactions" << endl;
-    cout << "   - Example: vector.push_back() with potential reallocation" << endl;
-    
-    cout << "\n3. Basic guarantee" << endl;
-    cout << "   - If exception thrown, object remains valid" << endl;
-    cout << "   - But may be in different state" << endl;
-    cout << "   - Example: partial file write before error" << endl;
-    
-    cout << "\n4. No guarantee (Bad!)" << endl;
-    cout << "   - Anything could happen on exception" << endl;
-    cout << "   - Don't write code like this" << endl;
+
+    cout << "\nSetiap function seharusnya punya 'guarantee' kalau terjadi exception:" << endl;
+
+    cout << "\n1. NO-THROW guarantee (paling kuat)" << endl;
+    cout << "   Fungsi TIDAK PERNAH throw exception" << endl;
+    cout << "   Tandai dengan: noexcept" << endl;
+    cout << "   Contoh: int double_val(int x) noexcept { return x * 2; }" << endl;
+
+    cout << "\n2. STRONG guarantee (all-or-nothing)" << endl;
+    cout << "   Kalau gagal: tidak ada yang berubah (seperti database transaction)" << endl;
+    cout << "   Di JS: mirip Promise.all - semua berhasil atau tidak ada yang dicommit" << endl;
+    cout << "   Contoh: vector.push_back() - kalau gagal alokasi, vector tidak berubah" << endl;
+
+    cout << "\n3. BASIC guarantee (minimum acceptable)" << endl;
+    cout << "   Kalau gagal: object masih valid tapi mungkin state berubah" << endl;
+    cout << "   Tidak ada memory leak, tidak ada corrupt data" << endl;
+    cout << "   Contoh: partial file write sebelum error" << endl;
+
+    cout << "\n4. NO guarantee (hindari ini!)" << endl;
+    cout << "   Exception = chaos, bisa memory leak, corrupt state" << endl;
+    cout << "   Jangan tulis kode seperti ini" << endl;
+
+    cout << "\nRekomendasi: paling tidak berikan BASIC guarantee di semua kode" << endl;
 }
 
 // ============================================================================
-// SECTION 7: File Operations with Exception Handling
+// SECTION 7: File Operations dengan Exception Handling
 // ============================================================================
 
 void safeReadFile(const string& filename) {
     try {
         ifstream file(filename);
-        
+
         if (!file.is_open()) {
-            throw FileException("Cannot open file: " + filename);
+            throw FileException("Tidak bisa membuka file: " + filename);
         }
-        
+
         string line;
         int lineNum = 0;
-        
+
         while (getline(file, line)) {
             lineNum++;
             if (line.empty()) {
-                throw ValidationException("line", "Empty line at " + to_string(lineNum));
+                throw ValidationException(
+                    "baris " + to_string(lineNum),
+                    "Baris kosong tidak diijinkan"
+                );
             }
         }
-        
+
+        cout << "  File berhasil dibaca: " << lineNum << " baris" << endl;
         file.close();
     }
     catch (const FileException& e) {
-        cout << "    File error: " << e.what() << endl;
+        cout << "  File error: " << e.what() << endl;
     }
     catch (const ValidationException& e) {
-        cout << "    Validation error: " << e.what() << endl;
+        cout << "  Validation error: " << e.what() << endl;
     }
     catch (const exception& e) {
-        cout << "    Unexpected error: " << e.what() << endl;
+        cout << "  Unexpected error: " << e.what() << endl;
     }
 }
 
 void section7_FileHandling() {
     cout << "\n" << string(60, '=') << endl;
-    cout << "SECTION 7: Robust File Handling" << endl;
+    cout << "SECTION 7: File Handling yang Robust" << endl;
     cout << string(60, '=') << endl;
-    
-    cout << "\nAttempting to read non-existent file:" << endl;
-    safeReadFile("build/nonexistent.txt");
-    
-    cout << "\nApplication continues despite error!" << endl;
+
+    cout << "\nCoba baca file yang tidak ada:" << endl;
+    safeReadFile("build/tidak_ada.txt");
+
+    cout << "\nCoba baca file yang ada:" << endl;
+    safeReadFile("build/output.txt");  // Dibuat oleh section 04
+
+    cout << "\nProgram tetap jalan meskipun ada error!" << endl;
 }
 
 // ============================================================================
@@ -364,22 +478,25 @@ void section8_BestPractices() {
     cout << "\n" << string(60, '=') << endl;
     cout << "SECTION 8: Exception Handling Best Practices" << endl;
     cout << string(60, '=') << endl;
-    
-    cout << "\n✓ DO:" << endl;
-    cout << "  - Use specific exception types" << endl;
-    cout << "  - Catch by const reference" << endl;
-    cout << "  - Use RAII for resource management" << endl;
-    cout << "  - Document exception guarantees" << endl;
-    cout << "  - Cleanup properly before re-throwing" << endl;
-    
-    cout << "\n✗ DON'T:" << endl;
-    cout << "  - Catch by value (can cause slicing)" << endl;
-    cout << "  - Catch all exceptions (...) silently" << endl;
-    cout << "  - Use exceptions for normal control flow" << endl;
-    cout << "  - Throw pointers or char*" << endl;
-    cout << "  - Write code that can't meet some guarantee" << endl;
-    
-    cout << "\n  catch (...) { }  // Catches everything - dangerous!" << endl;
+
+    cout << "\nYANG HARUS DILAKUKAN:" << endl;
+    cout << "  - Gunakan tipe exception yang spesifik (bukan hanya exception)" << endl;
+    cout << "  - Catch by const reference: catch (const Error& e)" << endl;
+    cout << "    (Di JS: catch (e) - tidak ada pilihan selain reference-like)" << endl;
+    cout << "  - Pakai RAII untuk resource management (bukan manual try/finally)" << endl;
+    cout << "  - Implement what() di custom exception" << endl;
+
+    cout << "\nYANG JANGAN DILAKUKAN:" << endl;
+    cout << "  - Catch by value: catch (Error e) -> bisa terjadi object slicing!" << endl;
+    cout << "  - Catch semua dan diam: catch (...) {} -> sangat berbahaya!" << endl;
+    cout << "  - Gunakan exception untuk kontrol flow normal (seperti return)" << endl;
+    cout << "  - Throw pointer atau char* (pakai exception objects)" << endl;
+
+    cout << "\nTip untuk JS/TS developer:" << endl;
+    cout << "  - catch (e) di JS = catch (const exception& e) di C++" << endl;
+    cout << "  - e.message di JS = e.what() di C++" << endl;
+    cout << "  - finally {} di JS = destructor di C++" << endl;
+    cout << "  - instanceof check = berbeda catch blocks di C++" << endl;
 }
 
 // ============================================================================
@@ -388,9 +505,10 @@ void section8_BestPractices() {
 
 int main() {
     cout << "\n" << string(60, '*') << endl;
-    cout << "EXCEPTION HANDLING - Robust Error Management" << endl;
+    cout << "EXCEPTION HANDLING - Error Management" << endl;
+    cout << "(Mirip JS/TS! try/catch sama, bedanya tipe-specific catch)" << endl;
     cout << string(60, '*') << endl;
-    
+
     section1_BasicTryCatch();
     section2_MultipleCatches();
     section3_ExceptionHierarchy();
@@ -399,23 +517,23 @@ int main() {
     section6_ExceptionGuarantees();
     section7_FileHandling();
     section8_BestPractices();
-    
+
     cout << "\n" << string(60, '=') << endl;
-    cout << "SUMMARY" << endl;
+    cout << "RINGKASAN" << endl;
     cout << string(60, '=') << endl;
-    cout << "\nKey Takeaways:" << endl;
-    cout << "1. Use try-catch to handle errors gracefully" << endl;
-    cout << "2. Catch specific exceptions, then general" << endl;
-    cout << "3. Always catch by const reference" << endl;
-    cout << "4. RAII ensures cleanup even on exception" << endl;
-    cout << "5. Provide exception safety guarantees" << endl;
-    cout << "\nFor ECDIS Development:" << endl;
-    cout << "  - Validate all input files" << endl;
-    cout << "  - Use exceptions for real errors" << endl;
-    cout << "  - Don't let parse errors crash the app" << endl;
-    cout << "  - Log errors for debugging" << endl;
-    cout << "\nNext: Learn Modern C++ Features for cleaner code!" << endl;
+    cout << "\nPadanan JS/TS Exception → C++:" << endl;
+    cout << "  throw new Error('msg')    → throw runtime_error('msg')" << endl;
+    cout << "  throw new TypeError(...)  → throw invalid_argument(...)" << endl;
+    cout << "  throw new RangeError(...) → throw out_of_range(...)" << endl;
+    cout << "  catch (e) { e.message }   → catch (const exception& e) { e.what() }" << endl;
+    cout << "  finally { cleanup() }     → destructor (RAII pattern)" << endl;
+    cout << "  class MyErr extends Error → class MyErr : public exception" << endl;
+    cout << "\nPerbedaan utama:" << endl;
+    cout << "  - catch HARUS tentukan tipe di C++" << endl;
+    cout << "  - Tidak ada finally, pakai destructor (lebih baik!)" << endl;
+    cout << "  - noexcept = garansi function tidak throw" << endl;
+    cout << "\nNext: Modern C++ features untuk kode yang lebih bersih!" << endl;
     cout << string(60, '*') << endl << endl;
-    
+
     return 0;
 }

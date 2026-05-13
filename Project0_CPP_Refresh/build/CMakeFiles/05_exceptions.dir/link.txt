@@ -1,1 +1,1 @@
-/usr/bin/c++  -Wall -Wextra CMakeFiles/05_exceptions.dir/src/05_Exception_Handling.cpp.o -o bin/05_exceptions 
+/usr/bin/c++  -Wall -Wextra -g CMakeFiles/05_exceptions.dir/src/05_Exception_Handling.cpp.o -o bin/05_exceptions 

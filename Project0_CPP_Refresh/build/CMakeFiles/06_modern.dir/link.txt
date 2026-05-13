@@ -1,1 +1,1 @@
-/usr/bin/c++  -Wall -Wextra CMakeFiles/06_modern.dir/src/06_Modern_CPP.cpp.o -o bin/06_modern 
+/usr/bin/c++  -Wall -Wextra -g CMakeFiles/06_modern.dir/src/06_Modern_CPP.cpp.o -o bin/06_modern 
