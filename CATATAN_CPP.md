@@ -713,6 +713,33 @@ void ChartWidget::toggleTimer() {
 
 ---
 
+## Fase 1 — Challenge Review (2026-05-18)
+
+### Challenge 1: Signal & Slot — LULUS ✓
+
+**Project:** `temp_monitor/` — TemperatureMonitor emit suhu → AlarmSystem cetak alert
+
+**Poin yang dipelajari ulang:**
+- Signal **wajib** return `void` — bukan `double` atau tipe lain
+- `Q_OBJECT` ≠ `public QObject`: Q_OBJECT adalah instruksi ke **MOC** untuk generate kode signal/slot. Tanpa Q_OBJECT, MOC tidak bekerja → signal/slot tidak bisa dipakai
+- `app.exec()` = blocking event loop — untuk app sederhana yang tidak butuh event loop, cukup `return 0`
+- `QCoreApplication` untuk console/non-GUI, `QApplication` untuk GUI
+
+**Qt4-style connect (lama, hindari):**
+```cpp
+// String-based — typo tidak ketahuan saat compile, error baru muncul runtime
+QObject::connect(&sensor, SIGNAL(posisiDiperbarui(double, double)),
+                 &display, SLOT(onPosisiDiperbarui(double, double)));
+```
+
+**Qt5/6-style connect (pakai ini):**
+```cpp
+// Pointer to member function — typo = compile error, type-safe
+QObject::connect(&sensor, &Sender::namaSignal, &receiver, &Receiver::namaSlot);
+```
+
+---
+
 ## Tips Umum
 
 ### Compile flags berguna
