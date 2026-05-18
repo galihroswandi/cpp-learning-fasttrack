@@ -715,6 +715,40 @@ void ChartWidget::toggleTimer() {
 
 ## Fase 1 — Challenge Review (2026-05-18)
 
+### Challenge 2: Widget & Layout — LULUS ✓
+
+**Project:** `temp_conversion/` — konverter Celsius ke Fahrenheit dengan QMainWindow
+
+**Poin yang dipelajari ulang:**
+- `setCentralWidget(central)` wajib untuk QMainWindow sebelum bisa taruh widget
+- `QHBoxLayout` bisa di-nest ke dalam `QVBoxLayout` via `addLayout()` — ownership otomatis berpindah
+- `QDoubleValidator` — validator input angka, mencegah user ketik huruf
+- Semua widget sebaiknya diberi parent `this` saat konstruksi — Qt reparent otomatis via layout tapi inkonsisten kalau tidak ditulis
+
+**Kenapa widget selalu pointer (`QLabel*`, bukan `QLabel`):**
+1. Qt ownership model — widget dialokasikan di heap supaya parent bisa delete saat dihancurkan
+2. Kalau nilai biasa (stack), widget dihapus saat keluar scope — terlalu cepat
+3. `QObject` copy constructor **di-delete** — Qt melarang salinan widget, wajib pakai pointer
+
+**Type promotion dalam ekspresi campuran:**
+`double × int` → int dipromote ke double → hasil double → tidak ada integer division
+```cpp
+inputUserDouble * 9 / 5   // inputUserDouble=double → *9 → double → /5 → double ✓
+9 / 5                      // int/int → integer division = 1 ✗ (jangan tulis ini)
+9.0 / 5                    // double/int → double = 1.8 ✓ (cara eksplisit)
+```
+
+**Format angka ke QString:**
+```cpp
+// Cara yang benar — kontrol format desimal
+QString::number(nilai, 'f', 2)   // 'f' = fixed, 2 = 2 desimal
+
+// Alternatif dengan QString::arg:
+QString("Hasil: %1 °F").arg(QString::number(nilai, 'f', 2))
+```
+
+---
+
 ### Challenge 1: Signal & Slot — LULUS ✓
 
 **Project:** `temp_monitor/` — TemperatureMonitor emit suhu → AlarmSystem cetak alert
