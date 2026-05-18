@@ -1,0 +1,66 @@
+# Build artifacts
+/build/
+**/build/
+**/Desktop_Qt_*/*
+**/CMakeFiles/
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/Makefile
+**/*.o
+**/*.obj
+**/*.gch
+**/*.pch
+**/*.so
+**/*.a
+**/*.lib
+**/*.dll
+**/*.exe
+**/*.out
+**/*.app
+**/*.dSYM/
+
+# Qt Creator / Qt build artifacts
+*.pro.user*
+*.qmake.stash
+*.qmake.cache
+*.moc
+*.moc.cpp
+*.obj
+*.qrc.cpp
+*.qrc.*
+*.rcc
+*.ts
+
+# IDE / editor files
+.vscode/
+*.swp
+*~
+*.bak
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Generated outputs
+/output/
+**/output/
+
+# Misc
+*.log
+*.log.*
+
+# Ignore shipped compile output binaries if any
+ecdis_fleet
+fleet
+functions
+inheritance
+kapal
+main
+memory
+navigator
+pointers
+sensor
+sensor_manager
+stl_demo
+vessel
+vessel_info
+vessel_registry

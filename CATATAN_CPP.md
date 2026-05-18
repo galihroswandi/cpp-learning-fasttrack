@@ -1,0 +1,739 @@
+# Catatan Belajar C++ untuk ECDIS
+
+Ringkasan materi dari sesi belajar. Background: web dev JS/TS yang belajar C++ untuk kontribusi ke project ECDIS (Electronic Chart Display and Information System).
+
+---
+
+## Sesi 1 — Syntax Dasar & Tipe Statis
+
+### Konsep utama
+Di JavaScript, tipe variabel bisa berubah kapan saja. Di C++, tipe **dikunci saat deklarasi** dan tidak bisa berubah. Error tipe ketahuan saat **compile**, bukan saat program jalan.
+
+### Tipe dasar
+
+| C++ | JS padanan | Keterangan |
+|---|---|---|
+| `int` | `number` (bulat) | Bilangan bulat |
+| `double` | `number` (desimal) | Desimal 64-bit, untuk koordinat GPS |
+| `float` | - | Desimal 32-bit, presisi lebih rendah |
+| `bool` | `boolean` | `true`/`false`, disimpan sebagai 1/0 |
+| `std::string` | `string` | Butuh `#include <string>` |
+
+### Contoh
+
+```cpp
+#include <iostream>
+#include <string>
+
+int main() {
+    int kecepatan = 12;
+    double latitude = -6.2088;   // selalu double untuk koordinat GPS
+    bool berlayar = true;
+    std::string nama_kapal = "KM Nusantara";
+
+    std::cout << nama_kapal << std::endl;
+    std::cout << std::boolalpha << berlayar << std::endl; // tampil "true", bukan "1"
+
+    return 0;
+}
+```
+
+### Format output
+
+```cpp
+#include <iomanip>
+
+std::cout << std::fixed << std::setprecision(4) << latitude;  // 4 angka desimal
+std::cout << std::setw(3) << std::setfill('0') << heading;   // leading zero: 045
+```
+
+### Compile & run
+```bash
+g++ main.cpp -o output && ./output
+```
+
+---
+
+## Sesi 2 — Fungsi & Parameter
+
+### Konsep utama
+Setiap fungsi C++ wajib deklarasikan **tipe return** dan **tipe setiap parameter**. Fungsi harus dideklarasikan sebelum dipanggil — gunakan **function prototype** jika definisi ada di bawah `main`.
+
+### Syntax
+
+```cpp
+// Prototype — "janji" ke compiler
+double hitungJarak(double lat1, double lon1, double lat2, double lon2);
+void tampilkanPosisi(double lat, double lon);   // void = tidak return apa-apa
+
+int main() {
+    double d = hitungJarak(-6.2, 106.8, -7.2, 112.7);
+    tampilkanPosisi(-6.2, 106.8);
+    return 0;
+}
+
+double hitungJarak(double lat1, double lon1, double lat2, double lon2) {
+    double dlat = lat2 - lat1;
+    double dlon = lon2 - lon1;
+    return std::sqrt(dlat * dlat + dlon * dlon);  // butuh #include <cmath>
+}
+```
+
+### Kapan pakai void vs return type
+- `void` → fungsi hanya punya efek samping (print, tulis file, ubah state)
+- return type → fungsi menghasilkan nilai yang dibutuhkan caller
+
+### Implicit type conversion
+`int` bisa otomatis dikonversi ke `double` (widening, aman). Sebaliknya tidak — `double` ke `int` memotong desimal dan compiler bisa warning.
+
+---
+
+## Sesi 3 — Pointer & Referensi
+
+### Konsep utama
+Setiap variabel punya **alamat di RAM**. Pointer menyimpan alamat itu. Referensi adalah alias (nama lain) untuk variabel yang sama.
+
+### Dua operator penting
+
+| Operator | Nama | Arti |
+|---|---|---|
+| `&` | address-of | "ambil alamat variabel ini" |
+| `*` | dereference | "pergi ke alamat ini, ambil nilainya" |
+
+### Pointer
+
+```cpp
+double latitude = -6.2088;
+double* ptr = &latitude;    // ptr menyimpan alamat latitude
+                             // * di sini = bagian dari TIPE (double*)
+
+*ptr = -7.2575;             // * di sini = dereference operator
+                             // sama dengan: latitude = -7.2575
+```
+
+### Referensi
+
+```cpp
+double latitude = -6.2088;
+double& ref = latitude;     // ref adalah alias untuk latitude
+ref = -7.2575;              // sama persis dengan: latitude = -7.2575
+```
+
+### Perbedaan pointer vs referensi
+
+| | Pointer `*` | Referensi `&` |
+|---|---|---|
+| Bisa null | Ya | Tidak |
+| Bisa diarahkan ulang | Ya | Tidak |
+| Perlu dereference | Ya (`*ptr`) | Tidak (langsung pakai) |
+| Kapan dipakai | Data opsional, array dinamis | Parameter fungsi |
+
+### Pass by reference di fungsi
+
+```cpp
+// Tanpa referensi — nilai di caller TIDAK berubah
+void tambahOffset(double lat) { lat += 0.5; }
+
+// Dengan referensi — nilai di caller IKUT berubah
+void tambahOffset(double& lat) { lat += 0.5; }
+
+// const& — baca saja, tidak ubah, tidak copy
+void tampilkan(const double& lat) { std::cout << lat; }
+```
+
+### Aturan pointer dan inheritance
+- `Vessel* v = new Warship(...)` → **valid** (child IS-A parent)
+- `Warship* v = new Vessel(...)` → **invalid** (parent bukan child)
+
+---
+
+## Sesi 4 — OOP: Class, Constructor, Destructor
+
+### Konsep utama
+Class di C++ mirip JS ES6, tapi:
+- Default access adalah **private** (bukan public seperti JS)
+- Ada **destructor** (`~ClassName`) yang dipanggil saat objek keluar scope
+- **Lifetime objek dikontrol oleh scope `{}`**, bukan garbage collector
+
+### Access modifier
+
+| Modifier | Akses dari luar class | Akses dari class anak |
+|---|---|---|
+| `private` | Tidak | Tidak |
+| `protected` | Tidak | Ya |
+| `public` | Ya | Ya |
+
+### Syntax
+
+```cpp
+class Vessel {
+private:
+    std::string nama;
+    double latitude, longitude;
+    double kecepatan;
+
+public:
+    // Constructor — member initializer list (cara idiomatik C++)
+    Vessel(std::string n, double lat, double lon)
+        : nama(n), latitude(lat), longitude(lon), kecepatan(0.0) {
+        std::cout << "[+] Vessel dibuat: " << nama << std::endl;
+    }
+
+    // Destructor
+    ~Vessel() {
+        std::cout << "[-] Vessel dihapus: " << nama << std::endl;
+    }
+
+    // Setter dengan validasi
+    void setKecepatan(double k) {
+        if (k < 0) return;   // tolak nilai tidak valid
+        kecepatan = k;
+    }
+
+    // Getter
+    double getLatitude() { return latitude; }
+
+    void tampilkan() {
+        std::cout << "Kapal: " << nama << " | Speed: " << kecepatan << std::endl;
+    }
+};
+```
+
+### Scope dan destructor
+
+```cpp
+int main() {
+    {
+        Vessel kapal("KM A", -6.2, 106.8);
+        kapal.tampilkan();
+    }  // destructor KM A dipanggil DI SINI
+
+    {
+        Vessel kapal2("KM B", -7.2, 112.7);
+    }  // destructor KM B dipanggil DI SINI
+
+    return 0;
+}
+```
+
+### Pass object ke fungsi
+Selalu gunakan `const&` untuk objek agar tidak membuat salinan:
+```cpp
+void cetakKapal(const Vessel& v) { v.tampilkan(); }  // tidak ada copy
+// bukan:
+void cetakKapal(Vessel v) { v.tampilkan(); }  // membuat copy, destructor 2x
+```
+
+---
+
+## Sesi 5 — Inheritance & Polymorphism
+
+### Konsep utama
+C++ mendukung inheritance seperti JS, tapi polymorphism membutuhkan keyword **`virtual`** secara eksplisit. Tanpa `virtual`, memanggil method lewat pointer induk selalu jalan method induk.
+
+### Syntax inheritance
+
+```cpp
+class Vessel {
+protected:
+    std::string nama;
+
+public:
+    Vessel(std::string n) : nama(n) {}
+    virtual ~Vessel() {}           // WAJIB virtual jika jadi base class
+    virtual void tampilkan() {     // virtual = bisa di-override
+        std::cout << "Kapal: " << nama << std::endl;
+    }
+};
+
+class Warship : public Vessel {
+private:
+    int jumlah_meriam;
+
+public:
+    Warship(std::string n, int meriam)
+        : Vessel(n), jumlah_meriam(meriam) {}  // panggil constructor induk
+
+    void tampilkan() override {    // override = eksplisit menimpa method induk
+        Vessel::tampilkan();       // panggil versi induk dulu (seperti super.tampilkan())
+        std::cout << "Meriam: " << jumlah_meriam << std::endl;
+    }
+};
+```
+
+### Polymorphism via virtual
+
+```cpp
+Vessel* armada[3];
+armada[0] = new Vessel("KM Nusantara");
+armada[1] = new Warship("KRI Diponegoro", 76);
+armada[2] = new PassengerShip("Ferry B", 200);
+
+for (int i = 0; i < 3; i++) {
+    armada[i]->tampilkan();  // memanggil method yang TEPAT untuk setiap tipe
+}
+```
+
+### Urutan constructor & destructor
+- **Constructor:** induk dipanggil **duluan**, lalu anak (membangun dari bawah ke atas)
+- **Destructor:** anak dipanggil **duluan**, lalu induk (membongkar dari atas ke bawah)
+
+### Kenapa destructor harus virtual
+Tanpa `virtual ~Vessel()`, pemanggilan `delete` via pointer induk hanya menjalankan destructor induk. Destructor anak tidak pernah jalan → resource leak.
+
+---
+
+## Sesi 6 — STL: vector, map, string
+
+### Konsep utama
+STL menyediakan struktur data siap pakai. Gunakan ini daripada implementasi sendiri.
+
+| JavaScript | C++ STL | Header |
+|---|---|---|
+| `Array` / `[]` | `std::vector<T>` | `<vector>` |
+| `Map` / `Object` | `std::map<K,V>` | `<map>` |
+| `string` | `std::string` | `<string>` |
+
+### vector
+
+```cpp
+#include <vector>
+
+std::vector<std::string> kapal;
+kapal.push_back("KM Nusantara");   // tambah di akhir
+kapal.push_back("KRI Diponegoro");
+
+std::cout << kapal.size() << std::endl;  // jumlah elemen
+
+// Loop — selalu pakai const& untuk efisiensi
+for (const std::string& nama : kapal) {
+    std::cout << nama << std::endl;
+}
+
+// JANGAN push_back di dalam range-based for loop — undefined behavior!
+```
+
+### map
+
+```cpp
+#include <map>
+
+std::map<std::string, double> kecepatan;
+kecepatan["KM Nusantara"] = 14.5;
+
+// map selalu terurut by key (alfabetis) — berbeda dari JS Map
+// Akses key yang tidak ada MEMBUAT entry baru dengan nilai default!
+
+// Cara aman cek key:
+if (kecepatan.count("KM Nusantara") > 0) {
+    std::cout << kecepatan["KM Nusantara"] << std::endl;
+}
+
+// Loop map
+for (const auto& entry : kecepatan) {
+    std::cout << entry.first << ": " << entry.second << std::endl;
+    //          ^ key                   ^ value
+}
+```
+
+### Format double ke string (untuk log/string building)
+
+```cpp
+#include <sstream>
+#include <iomanip>
+
+std::ostringstream oss;
+oss << std::fixed << std::setprecision(1) << 14.5678;
+std::string hasil = oss.str();  // "14.6"
+
+// Jangan pakai std::to_string(double) untuk format — selalu 6 desimal
+```
+
+---
+
+## Sesi 7 — Memory Management
+
+### Konsep utama
+- Variabel lokal dialokasikan di **stack** — otomatis dihapus saat keluar scope
+- `new` mengalokasikan di **heap** — harus manual `delete`, atau pakai smart pointer
+- Lupa `delete` = **memory leak**
+- Early return / exception melewati `delete` → pakai smart pointer
+
+### Raw pointer (hindari di kode modern)
+
+```cpp
+Sensor* raw = new Sensor("GPS");
+raw->baca();
+delete raw;   // wajib — tidak ada yang auto-cleanup
+
+// Bahaya:
+delete raw;
+raw->baca();  // use-after-free → segfault / undefined behavior
+```
+
+### Smart pointer (gunakan ini)
+
+```cpp
+#include <memory>
+
+// unique_ptr — satu pemilik, auto-delete saat keluar scope
+std::unique_ptr<Sensor> uptr = std::make_unique<Sensor>("Radar");
+uptr->baca();
+// tidak perlu delete — otomatis saat scope berakhir
+
+// Tidak bisa di-copy, hanya bisa dipindah:
+auto uptr2 = std::move(uptr);  // uptr sekarang null
+
+// shared_ptr — bisa banyak pemilik, hapus saat semua selesai
+std::shared_ptr<Sensor> sptr1 = std::make_shared<Sensor>("AIS");
+{
+    std::shared_ptr<Sensor> sptr2 = sptr1;  // reference count = 2
+    sptr1.use_count();  // 2
+}  // sptr2 hancur, reference count = 1 — sensor BELUM dihapus
+// sptr1 hancur di akhir scope → count = 0 → sensor dihapus
+```
+
+### Ambil raw pointer dari smart pointer (non-owning)
+
+```cpp
+Sensor* raw = uptr.get();   // .get() — bukan ->get()
+raw->baca();                 // gunakan, tapi JANGAN delete
+```
+
+### Kapan pakai yang mana
+
+| | `unique_ptr` | `shared_ptr` |
+|---|---|---|
+| Kepemilikan | Satu pemilik | Banyak pemilik |
+| Contoh ECDIS | Sensor fisik (Radar, AIS) | Data navigasi dibaca banyak modul |
+| Overhead | Minimal | Ada reference counter |
+
+### RAII — Resource Acquisition Is Initialization
+Smart pointer adalah implementasi RAII: resource dipegang objek yang umurnya dikontrol scope. Destructor selalu jalan, bahkan saat exception atau early return.
+
+### Destructor chain otomatis
+```cpp
+// Saat unique_ptr<Manager> keluar scope:
+// unique_ptr → hapus Manager → hapus vector → hapus setiap unique_ptr<Sensor>
+//            → hapus setiap Sensor
+// Semua tanpa satu pun delete eksplisit
+```
+
+---
+
+## Sesi 8 — Qt Basics: QObject & Signal/Slot
+
+### Konsep utama
+Signal/slot adalah sistem komunikasi antar objek di Qt. Sender tidak perlu tahu siapa yang menerima — loose coupling seperti event emitter di JS, tapi type-safe di compile time.
+
+| JavaScript | Qt Signal/Slot |
+|---|---|
+| `addEventListener('event', fn)` | `QObject::connect(sender, signal, receiver, slot)` |
+| `emit('event', data)` | `emit namaSignal(data)` |
+| Runtime type check | Compile-time type check |
+| String-based event name | Function pointer — typo = error |
+
+### Syarat class Qt
+Setiap class yang pakai signal/slot **wajib**:
+1. Inherit dari `QObject`
+2. Punya macro `Q_OBJECT` di awal class body
+3. Didefinisikan di file `.h` (diproses moc)
+
+### Syntax
+
+```cpp
+#include <QObject>
+#include <QDebug>
+
+class SensorGPS : public QObject {
+    Q_OBJECT
+
+public:
+    explicit SensorGPS(QObject* parent = nullptr) : QObject(parent) {}
+
+    void simulasiBaca() {
+        emit posisiDiperbarui(-6.2088, 106.8456);  // kirim signal
+    }
+
+signals:
+    void posisiDiperbarui(double lat, double lon);  // deklarasi saja, moc yang implement
+};
+
+class ECDISDisplay : public QObject {
+    Q_OBJECT
+
+public:
+    explicit ECDISDisplay(QObject* parent = nullptr) : QObject(parent) {}
+
+public slots:
+    void onPosisiDiperbarui(double lat, double lon) {
+        qDebug() << "Posisi:" << lat << lon;
+    }
+};
+```
+
+### Connect signal ke slot
+
+```cpp
+// main.cpp
+SensorGPS sensor;
+ECDISDisplay display;
+
+// Qt5/6 style — type-safe, pointer ke fungsi
+QObject::connect(&sensor,  &SensorGPS::posisiDiperbarui,
+                 &display, &ECDISDisplay::onPosisiDiperbarui);
+
+sensor.simulasiBaca();  // emit signal → slot dipanggil otomatis
+
+// Disconnect
+QObject::disconnect(&sensor, &SensorGPS::posisiDiperbarui,
+                    &display, &ECDISDisplay::onPosisiDiperbarui);
+```
+
+### Aturan signal/slot
+- Slot boleh punya **lebih sedikit parameter** dari signal — extra param dibuang
+- Tipe harus cocok — implicit conversion bisa terjadi diam-diam (hati-hati!)
+- Satu signal bisa connect ke **banyak slot** (many-to-many)
+- `emit` memanggil semua slot yang terhubung secara sinkron
+
+### Qt log levels
+
+```cpp
+qDebug()    << "info debug";      // development info
+qInfo()     << "info biasa";      // runtime info
+qWarning()  << "ada masalah";     // peringatan — tidak fatal
+qCritical() << "error serius";    // error tapi program masih jalan
+qFatal()    << "fatal error";     // program abort
+```
+
+### Build Qt project
+Qt butuh build system khusus — tidak bisa pakai `g++` langsung.
+- Gunakan **Qt Creator** → Build → Run (`Ctrl+R`)
+- Output ada di "Application Output" panel
+
+---
+
+## Sesi 9 — Qt Widgets & Event Handling
+
+### Konsep utama
+Qt Widgets adalah library GUI Qt. Semua elemen UI adalah object yang dihubungkan via signal/slot. Widget disusun menggunakan layout manager.
+
+### QApplication vs QCoreApplication
+- `QCoreApplication` — untuk console/non-GUI app (event loop saja)
+- `QApplication` — inherit dari QCoreApplication, tambah font, palette, window management. **Wajib untuk GUI.**
+
+### Widget dasar
+
+| Widget | Fungsi | Padanan HTML |
+|---|---|---|
+| `QLabel` | Tampilkan teks/gambar | `<span>`, `<p>` |
+| `QPushButton` | Tombol klik | `<button>` |
+| `QLineEdit` | Input teks satu baris | `<input type="text">` |
+| `QMainWindow` | Jendela utama | `<body>` |
+
+### Structure dasar MainWindow
+
+```cpp
+// mainwindow.h
+class MainWindow : public QMainWindow {
+    Q_OBJECT
+public:
+    explicit MainWindow(QWidget* parent = nullptr);
+private slots:
+    void onTombolKlik();
+private:
+    QLabel* label;
+    QPushButton* tombol;
+};
+
+// mainwindow.cpp
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
+    QWidget* central = new QWidget(this);
+    setCentralWidget(central);           // wajib untuk QMainWindow
+
+    QVBoxLayout* layout = new QVBoxLayout(central);
+    label  = new QLabel("teks awal", this);
+    tombol = new QPushButton("Klik", this);
+    layout->addWidget(label);
+    layout->addWidget(tombol);
+
+    connect(tombol, &QPushButton::clicked, this, &MainWindow::onTombolKlik);
+}
+
+void MainWindow::onTombolKlik() {
+    label->setText("Diklik!");
+}
+```
+
+### Layout manager
+
+```cpp
+QVBoxLayout* vbox = new QVBoxLayout();   // susun vertikal (column)
+QHBoxLayout* hbox = new QHBoxLayout();   // susun horizontal (row)
+
+// Nested layout — JANGAN beri parent yang sama dengan parent layout
+QHBoxLayout* hbox = new QHBoxLayout();  // tanpa parent
+vbox->addLayout(hbox);                   // ownership via addLayout
+// BUKAN: new QHBoxLayout(central) jika central sudah punya layout
+```
+
+### Qt ownership model — tidak perlu delete manual
+```cpp
+// Widget dengan parent — otomatis dihapus saat parent dihapus
+QLabel* label = new QLabel("teks", this);  // 'this' adalah parent
+// Saat MainWindow dihapus → semua child dihapus otomatis
+```
+
+### QString formatting
+```cpp
+QString text = QString("Posisi #%1: Lat %2, Lon %3")
+               .arg(updateCount)          // %1
+               .arg(lat)                  // %2
+               .arg(lon);                 // %3
+
+// Ambil teks dari QLineEdit:
+QString input = lineEdit->text();
+
+// Update label:
+label->setText(text);
+```
+
+### Pola uiUpdate() — centralize UI refresh
+```cpp
+void uiUpdate() {
+    labelNama->setText(namaKapal);
+    labelPosisi->setText(QString("Lat %1").arg(lat));
+    // semua update UI di satu tempat
+    // panggil dari semua slot yang mengubah state
+}
+```
+
+---
+
+## Sesi 10 — QPainter & Rendering Dasar
+
+### Konsep utama
+`QPainter` adalah API drawing Qt untuk render langsung ke widget — garis, bentuk, teks, polygon. Di ECDIS dipakai untuk chart display, plot posisi kapal, dan route rendering.
+
+### Flow rendering
+```
+Data berubah → update() → Qt schedule → paintEvent() dipanggil → gambar ulang
+```
+**Jangan panggil `paintEvent` langsung** — selalu lewat `update()`.
+
+### Setup
+
+```cpp
+// chartwidget.h
+class ChartWidget : public QWidget {
+    Q_OBJECT
+protected:
+    void paintEvent(QPaintEvent* event) override;
+};
+
+// chartwidget.cpp
+void ChartWidget::paintEvent(QPaintEvent* event) {
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);  // tepi halus
+    // ... drawing di sini
+}
+```
+
+### Sistem koordinat
+- `(0, 0)` = pojok kiri atas widget
+- X bertambah ke kanan, Y bertambah ke bawah
+- Konversi geografis → pixel: Y perlu dikali negatif karena latitude tumbuh ke atas
+
+```cpp
+int px = (int)((lon - lonRef) * scale + width() / 2);
+int py = (int)((lat + latRef) * (-scale) + height() / 2);
+```
+
+### QPainter API dasar
+
+```cpp
+// Background
+painter.fillRect(rect(), QColor(20, 60, 120));
+
+// Garis
+painter.setPen(QPen(QColor(r, g, b), tebal, Qt::SolidLine));
+painter.drawLine(x1, y1, x2, y2);
+
+// Polygon (segitiga kapal)
+QPolygon ship;
+ship << QPoint(px, py-12) << QPoint(px-8, py+8) << QPoint(px+8, py+8);
+painter.setBrush(QColor(255, 200, 0));
+painter.setPen(Qt::NoPen);
+painter.drawPolygon(ship);
+
+// Lingkaran / danger zone
+painter.setPen(QPen(QColor(255, 50, 50), 2, Qt::DashLine));
+painter.setBrush(Qt::NoBrush);
+painter.drawEllipse(QPoint(px, py), 40, 40);
+
+// Teks
+painter.setPen(Qt::white);
+painter.drawText(x, y, "teks");
+painter.drawText(10, 20, QString("Update: %1").arg(count));
+```
+
+### QTimer — gerakkan kapal otomatis
+
+```cpp
+#include <QTimer>
+
+// Setup di constructor
+QTimer* timer = new QTimer(this);
+connect(timer, &QTimer::timeout, this, &ChartWidget::moveShip);
+timer->start(800);   // emit timeout setiap 800ms
+
+// Slot
+void ChartWidget::moveShip() {
+    shipLon += 0.05;
+    updateCount++;
+    update();        // trigger repaint
+}
+
+// Toggle stop/start
+void ChartWidget::toggleTimer() {
+    if (timer->isActive()) timer->stop();
+    else timer->start(800);
+}
+```
+
+### Padanan JS
+| JS | Qt |
+|---|---|
+| `canvas.getContext('2d')` | `QPainter painter(this)` |
+| `ctx.fillStyle = 'blue'` | `painter.setBrush(QColor(...))` |
+| `ctx.fillRect(...)` | `painter.fillRect(...)` |
+| `ctx.arc(...)` | `painter.drawEllipse(...)` |
+| `setInterval(fn, 800)` | `QTimer` + `start(800)` |
+| `setState() / render()` | `update()` → `paintEvent()` |
+
+---
+
+## Tips Umum
+
+### Compile flags berguna
+```bash
+g++ -std=c++14 file.cpp -o output     # C++14 (untuk make_unique)
+g++ -Wall file.cpp -o output           # tampilkan semua warning
+g++ -std=c++14 -Wall file.cpp -o output
+```
+
+### Hal yang berbeda dari JavaScript
+
+| JavaScript | C++ |
+|---|---|
+| Tipe dinamis | Tipe statis, dikunci saat deklarasi |
+| GC otomatis | Manual `delete` atau smart pointer |
+| `undefined` saat akses property tidak ada | `map[]` membuat entry baru! |
+| `for...of` | Range-based `for (const auto& x : container)` |
+| `import` | `#include` |
+| `class extends` | `class Child : public Parent` |
+| Override otomatis | Butuh `virtual` dan `override` eksplisit |
+| `this.property` | `this->property` (via pointer) |
+
+### Koordinat GPS — selalu `double`
+`float` hanya 7 digit presisi — bisa beda **puluhan meter** untuk koordinat global. Di ECDIS selalu gunakan `double` untuk latitude/longitude.
