@@ -715,6 +715,46 @@ void ChartWidget::toggleTimer() {
 
 ## Fase 1 — Challenge Review (2026-05-18)
 
+### Fase 2 — Topik 1: QTimer — SELESAI ✓
+
+**Project:** `timer_basic/` — counter dengan start/stop/reset dan singleShot
+
+**Padanan JS:**
+| JavaScript | Qt |
+|---|---|
+| `setInterval(fn, ms)` | `timer->start(ms)` + connect ke slot |
+| `clearInterval(id)` | `timer->stop()` |
+| `setTimeout(fn, ms)` | `QTimer::singleShot(ms, this, slot/lambda)` |
+
+**Aturan penting:**
+- Beri parent `this` saat buat QTimer — ikut dihapus saat widget dihapus
+- Jangan pakai `sleep()` — membekukan event loop, UI tidak responsif
+- `stop()` tidak reset — `count` tetap di nilai terakhir
+- Update UI langsung di slot reset, jangan tunggu tick berikutnya
+
+**Lambda capture di C++ vs JS closure:**
+```cpp
+// JS — closure otomatis akses variabel luar
+const fn = () => label.setText("x");  // otomatis bisa akses label
+
+// C++ — harus eksplisit capture
+auto fn = [this]() { label->setText("x"); };  // [this] = izinkan akses member
+auto fn2 = []()   { label->setText("x"); };  // ERROR — label tidak dikenal
+```
+
+**`QTimer::singleShot` dengan lambda:**
+```cpp
+QTimer::singleShot(5000, this, [this]() {
+//                        ^^^^  ^^^^^^
+//                  context Qt  C++ lambda capture
+    label->setText("5 detik berlalu");
+});
+```
+- `this` ke-2 (argumen): context Qt — kalau widget dihapus sebelum timeout, lambda tidak dipanggil
+- `[this]` di lambda: C++ capture — izinkan akses `label`, `count`, dll via `this`
+
+---
+
 ### Challenge 3: QPainter — LULUS ✓
 
 **Project:** `qt_painter/` — widget custom dengan background, lingkaran transparan, dan teks
