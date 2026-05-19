@@ -715,6 +715,45 @@ void ChartWidget::toggleTimer() {
 
 ## Fase 1 — Challenge Review (2026-05-18)
 
+### Challenge 3: QPainter — LULUS ✓
+
+**Project:** `qt_painter/` — widget custom dengan background, lingkaran transparan, dan teks
+
+**Konsep utama QPainter:**
+- `paintEvent` = sesi menggambar. Semua drawing WAJIB di dalam sini
+- Jangan panggil `paintEvent()` langsung — panggil `update()` untuk minta Qt jadwalkan di waktu yang tepat
+- `update()` ≈ `requestAnimationFrame()` di JS — Qt batch beberapa `update()` menjadi satu `paintEvent`
+- `QPainter painter(this)` hanya valid di dalam `paintEvent` — di luar sesi ini widget tidak dalam mode drawing
+
+**Posisi dinamis — selalu pakai `width()/2` dan `height()/2`:**
+```cpp
+painter.drawEllipse(QPoint(width()/2, height()/2), 60, 60);  // ikut resize ✓
+painter.drawEllipse(QPoint(300, 200), 60, 60);                // hardcoded, tidak ikut resize ✗
+```
+
+**API QPainter penting:**
+```cpp
+painter.setRenderHint(QPainter::Antialiasing);           // tepi halus
+painter.fillRect(rect(), QColor(20, 30, 60));            // background — rect() selalu pas ukuran widget
+painter.setPen(QPen(warna, tebal, Qt::SolidLine));       // atur garis tepi
+painter.setBrush(Qt::NoBrush);                           // isi transparan
+painter.setBrush(QBrush(QColor(0, 150, 255, 80)));       // isi semi-transparan (alpha 0-255)
+painter.drawEllipse(QPoint(cx, cy), rx, ry);             // lingkaran
+painter.drawLine(x1, y1, x2, y2);                        // garis
+painter.drawText(QPoint(x, y), "teks");                  // teks
+```
+
+**Padanan JS Canvas:**
+| JS Canvas | Qt QPainter |
+|---|---|
+| `requestAnimationFrame(render)` | `update()` |
+| fungsi `render()` | `paintEvent()` |
+| `ctx.strokeStyle` | `painter.setPen(...)` |
+| `ctx.fillStyle` | `painter.setBrush(...)` |
+| `ctx.arc(...)` | `painter.drawEllipse(...)` |
+
+---
+
 ### Challenge 2: Widget & Layout — LULUS ✓
 
 **Project:** `temp_conversion/` — konverter Celsius ke Fahrenheit dengan QMainWindow

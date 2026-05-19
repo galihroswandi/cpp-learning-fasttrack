@@ -1,6 +1,6 @@
 #include "chartwidget.h"
 
-ChartWidget::ChartWidget(QWidget* parent) : QWidget(parent), shipLat(-6.2088), shipLon(106.8456)
+ChartWidget::ChartWidget(QWidget *parent) : QWidget(parent), shipLat(-6.2088), shipLon(106.8456)
 {
     updateCount = 0;
     timer = new QTimer(this);
@@ -10,7 +10,7 @@ ChartWidget::ChartWidget(QWidget* parent) : QWidget(parent), shipLat(-6.2088), s
     setMinimumSize(600, 400);
 }
 
-void ChartWidget::paintEvent(QPaintEvent* event)
+void ChartWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
@@ -20,13 +20,13 @@ void ChartWidget::paintEvent(QPaintEvent* event)
 
     // Grid garis koordinat
     painter.setPen(QPen(QColor(40, 80, 140), 1));
-    for(int x = 0; x < width(); x += 50)
+    for (int x = 0; x < width(); x += 50)
         painter.drawLine(x, 0, x, height());
-    for(int y = 0; y < height(); y+=50)
+    for (int y = 0; y < height(); y += 50)
         painter.drawLine(0, y, width(), y);
 
     // Posisi kapal - konversi koordinat ke pixel
-    int px = (int)((shipLon - 106.0) * 200 + width() /2);
+    int px = (int)((shipLon - 106.0) * 200 + width() / 2);
     int py = (int)((shipLat + 6.5) * (-200) + height() / 2);
 
     // Gambar kapal sebagai segitiga
@@ -61,9 +61,8 @@ void ChartWidget::moveShip()
 
 void ChartWidget::toggleTimer()
 {
-    if(timer->isActive())
+    if (timer->isActive())
         timer->stop();
     else
         timer->start(800);
-
 }
