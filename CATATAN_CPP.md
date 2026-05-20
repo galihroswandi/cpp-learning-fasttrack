@@ -939,6 +939,47 @@ model->removeRow(idx.row());
 
 ---
 
+### Topik 5: QSS / Theming — SELESAI ✓
+
+**Project:** `qss_basic/` — dark/light theme toggle dengan QSS
+
+**Tiga cara apply QSS (luas ke sempit):**
+```cpp
+qApp->setStyleSheet("...");         // seluruh app
+mainWindow->setStyleSheet("...");   // window + semua child
+button->setStyleSheet("...");       // widget ini saja (≈ inline style di CSS)
+```
+
+**Selector QSS:**
+```css
+QPushButton { }              /* semua QPushButton */
+QPushButton:hover { }        /* pseudo-state — WAJIB ditulis eksplisit, tidak ada default */
+QPushButton:pressed { }
+QPushButton#btnDanger { }    /* hanya widget dengan objectName "btnDanger" */
+```
+
+**Spesifisitas:** `#objectName` > `WidgetType` > inherited dari parent
+
+**setObjectName — wajib untuk selector `#id`:**
+```cpp
+btnDanger->setObjectName("btnDanger");  // baru bisa pakai QPushButton#btnDanger di QSS
+```
+
+**Raw string literal untuk QSS panjang:**
+```cpp
+setStyleSheet(R"(
+    QPushButton { border-radius: 6px; }
+)");
+// R"(...)" = padanan template literal JS ` ` — bisa multiline, tidak perlu \n
+```
+
+**Perbedaan dari CSS web:**
+- Pseudo-state (`hover`, `pressed`) tidak ada default visual — harus ditulis semua
+- `border-radius` butuh `border` juga dideklarasikan
+- Tidak ada class selector (`.class`) — pakai `#objectName` sebagai gantinya
+
+---
+
 ### Topik 4: Event Handling Lanjutan — SELESAI ✓
 
 **Project:** `modelview_basic/` — tambah keyPressEvent, mouseMoveEvent, closeEvent
