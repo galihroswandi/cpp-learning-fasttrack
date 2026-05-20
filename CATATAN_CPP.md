@@ -715,43 +715,59 @@ void ChartWidget::toggleTimer() {
 
 ## Fase 1 — Challenge Review (2026-05-18)
 
-### Fase 2 — Topik 1: QTimer — SELESAI ✓
+### Challenge 1: Signal & Slot — LULUS ✓
 
-**Project:** `timer_basic/` — counter dengan start/stop/reset dan singleShot
+**Project:** `temp_monitor/` — TemperatureMonitor emit suhu → AlarmSystem cetak alert
 
-**Padanan JS:**
-| JavaScript | Qt |
-|---|---|
-| `setInterval(fn, ms)` | `timer->start(ms)` + connect ke slot |
-| `clearInterval(id)` | `timer->stop()` |
-| `setTimeout(fn, ms)` | `QTimer::singleShot(ms, this, slot/lambda)` |
+**Poin yang dipelajari ulang:**
+- Signal **wajib** return `void` — bukan `double` atau tipe lain
+- `Q_OBJECT` ≠ `public QObject`: Q_OBJECT adalah instruksi ke **MOC** untuk generate kode signal/slot. Tanpa Q_OBJECT, MOC tidak bekerja → signal/slot tidak bisa dipakai
+- `app.exec()` = blocking event loop — untuk app sederhana yang tidak butuh event loop, cukup `return 0`
+- `QCoreApplication` untuk console/non-GUI, `QApplication` untuk GUI
 
-**Aturan penting:**
-- Beri parent `this` saat buat QTimer — ikut dihapus saat widget dihapus
-- Jangan pakai `sleep()` — membekukan event loop, UI tidak responsif
-- `stop()` tidak reset — `count` tetap di nilai terakhir
-- Update UI langsung di slot reset, jangan tunggu tick berikutnya
-
-**Lambda capture di C++ vs JS closure:**
+**Qt4-style connect (lama, hindari):**
 ```cpp
-// JS — closure otomatis akses variabel luar
-const fn = () => label.setText("x");  // otomatis bisa akses label
-
-// C++ — harus eksplisit capture
-auto fn = [this]() { label->setText("x"); };  // [this] = izinkan akses member
-auto fn2 = []()   { label->setText("x"); };  // ERROR — label tidak dikenal
+// String-based — typo tidak ketahuan saat compile, error baru muncul runtime
+QObject::connect(&sensor, SIGNAL(posisiDiperbarui(double, double)),
+                 &display, SLOT(onPosisiDiperbarui(double, double)));
 ```
 
-**`QTimer::singleShot` dengan lambda:**
+**Qt5/6-style connect (pakai ini):**
 ```cpp
-QTimer::singleShot(5000, this, [this]() {
-//                        ^^^^  ^^^^^^
-//                  context Qt  C++ lambda capture
-    label->setText("5 detik berlalu");
-});
+// Pointer to member function — typo = compile error, type-safe
+QObject::connect(&sensor, &Sender::namaSignal, &receiver, &Receiver::namaSlot);
 ```
-- `this` ke-2 (argumen): context Qt — kalau widget dihapus sebelum timeout, lambda tidak dipanggil
-- `[this]` di lambda: C++ capture — izinkan akses `label`, `count`, dll via `this`
+
+---
+
+### Challenge 2: Widget & Layout — LULUS ✓
+
+**Project:** `temp_conversion/` — konverter Celsius ke Fahrenheit dengan QMainWindow
+
+**Poin yang dipelajari ulang:**
+- `setCentralWidget(central)` wajib untuk QMainWindow sebelum bisa taruh widget
+- `QHBoxLayout` bisa di-nest ke dalam `QVBoxLayout` via `addLayout()` — ownership otomatis berpindah
+- `QDoubleValidator` — validator input angka, mencegah user ketik huruf
+- Semua widget sebaiknya diberi parent `this` saat konstruksi — Qt reparent otomatis via layout tapi inkonsisten kalau tidak ditulis
+
+**Kenapa widget selalu pointer (`QLabel*`, bukan `QLabel`):**
+1. Qt ownership model — widget dialokasikan di heap supaya parent bisa delete saat dihancurkan
+2. Kalau nilai biasa (stack), widget dihapus saat keluar scope — terlalu cepat
+3. `QObject` copy constructor **di-delete** — Qt melarang salinan widget, wajib pakai pointer
+
+**Type promotion dalam ekspresi campuran:**
+`double × int` → int dipromote ke double → hasil double → tidak ada integer division
+```cpp
+inputUserDouble * 9 / 5   // inputUserDouble=double → *9 → double → /5 → double ✓
+9 / 5                      // int/int → integer division = 1 ✗ (jangan tulis ini)
+9.0 / 5                    // double/int → double = 1.8 ✓ (cara eksplisit)
+```
+
+**Format angka ke QString:**
+```cpp
+QString::number(nilai, 'f', 2)                          // 'f' = fixed, 2 = 2 desimal
+QString("Hasil: %1 °F").arg(QString::number(nilai, 'f', 2))
+```
 
 ---
 
@@ -794,62 +810,85 @@ painter.drawText(QPoint(x, y), "teks");                  // teks
 
 ---
 
-### Challenge 2: Widget & Layout — LULUS ✓
+## Fase 2 — Intermediate
 
-**Project:** `temp_conversion/` — konverter Celsius ke Fahrenheit dengan QMainWindow
+### Topik 1: QTimer — SELESAI ✓
 
-**Poin yang dipelajari ulang:**
-- `setCentralWidget(central)` wajib untuk QMainWindow sebelum bisa taruh widget
-- `QHBoxLayout` bisa di-nest ke dalam `QVBoxLayout` via `addLayout()` — ownership otomatis berpindah
-- `QDoubleValidator` — validator input angka, mencegah user ketik huruf
-- Semua widget sebaiknya diberi parent `this` saat konstruksi — Qt reparent otomatis via layout tapi inkonsisten kalau tidak ditulis
+**Project:** `timer_basic/` — counter dengan start/stop/reset dan singleShot
 
-**Kenapa widget selalu pointer (`QLabel*`, bukan `QLabel`):**
-1. Qt ownership model — widget dialokasikan di heap supaya parent bisa delete saat dihancurkan
-2. Kalau nilai biasa (stack), widget dihapus saat keluar scope — terlalu cepat
-3. `QObject` copy constructor **di-delete** — Qt melarang salinan widget, wajib pakai pointer
+**Padanan JS:**
+| JavaScript | Qt |
+|---|---|
+| `setInterval(fn, ms)` | `timer->start(ms)` + connect ke slot |
+| `clearInterval(id)` | `timer->stop()` |
+| `setTimeout(fn, ms)` | `QTimer::singleShot(ms, this, slot/lambda)` |
 
-**Type promotion dalam ekspresi campuran:**
-`double × int` → int dipromote ke double → hasil double → tidak ada integer division
+**Aturan penting:**
+- Beri parent `this` saat buat QTimer — ikut dihapus saat widget dihapus
+- Jangan pakai `sleep()` — membekukan event loop, UI tidak responsif
+- `stop()` tidak reset — `count` tetap di nilai terakhir
+- Update UI langsung di slot reset, jangan tunggu tick berikutnya
+
+**Lambda capture di C++ vs JS closure:**
 ```cpp
-inputUserDouble * 9 / 5   // inputUserDouble=double → *9 → double → /5 → double ✓
-9 / 5                      // int/int → integer division = 1 ✗ (jangan tulis ini)
-9.0 / 5                    // double/int → double = 1.8 ✓ (cara eksplisit)
+// JS — closure otomatis akses variabel luar
+const fn = () => label.setText("x");  // otomatis bisa akses label
+
+// C++ — harus eksplisit capture
+auto fn = [this]() { label->setText("x"); };  // [this] = izinkan akses member
+auto fn2 = []()   { label->setText("x"); };  // ERROR — label tidak dikenal
 ```
 
-**Format angka ke QString:**
+**`QTimer::singleShot` dengan lambda:**
 ```cpp
-// Cara yang benar — kontrol format desimal
-QString::number(nilai, 'f', 2)   // 'f' = fixed, 2 = 2 desimal
-
-// Alternatif dengan QString::arg:
-QString("Hasil: %1 °F").arg(QString::number(nilai, 'f', 2))
+QTimer::singleShot(5000, this, [this]() {
+//                        ^^^^  ^^^^^^
+//                  context Qt  C++ lambda capture
+    label->setText("5 detik berlalu");
+});
 ```
+- `this` argumen Qt: kalau widget dihapus sebelum timeout, lambda tidak dipanggil
+- `[this]` lambda capture: izinkan akses `label`, `count`, dll via `this`
 
 ---
 
-### Challenge 1: Signal & Slot — LULUS ✓
+### Topik 2: Animasi QTimer + QPainter — SELESAI ✓
 
-**Project:** `temp_monitor/` — TemperatureMonitor emit suhu → AlarmSystem cetak alert
+**Project:** `ball_animation/` — bola memantul di 4 sisi dengan dx/dy velocity
 
-**Poin yang dipelajari ulang:**
-- Signal **wajib** return `void` — bukan `double` atau tipe lain
-- `Q_OBJECT` ≠ `public QObject`: Q_OBJECT adalah instruksi ke **MOC** untuk generate kode signal/slot. Tanpa Q_OBJECT, MOC tidak bekerja → signal/slot tidak bisa dipakai
-- `app.exec()` = blocking event loop — untuk app sederhana yang tidak butuh event loop, cukup `return 0`
-- `QCoreApplication` untuk console/non-GUI, `QApplication` untuk GUI
-
-**Qt4-style connect (lama, hindari):**
-```cpp
-// String-based — typo tidak ketahuan saat compile, error baru muncul runtime
-QObject::connect(&sensor, SIGNAL(posisiDiperbarui(double, double)),
-                 &display, SLOT(onPosisiDiperbarui(double, double)));
+**Pattern animasi Qt:**
+```
+QTimer (16ms) → onMoveBall() → update state → update() → paintEvent() → gambar ulang
 ```
 
-**Qt5/6-style connect (pakai ini):**
+**Velocity vector — lebih baik dari string arah:**
 ```cpp
-// Pointer to member function — typo = compile error, type-safe
-QObject::connect(&sensor, &Sender::namaSignal, &receiver, &Receiver::namaSlot);
+int dx = 3;   // + = kanan, - = kiri
+int dy = 2;   // + = bawah, - = atas
+
+// Bounce: balik tanda saat menyentuh dinding
+if (ballX - radius < 0 || ballX + radius > width())  dx = -dx;
+if (ballY - radius < 0 || ballY + radius > height()) dy = -dy;
 ```
+- `int dx/dy` lebih aman dari `QString arah` — typo ketahuan saat compile
+- Urutan: **gerak dulu, baru cek boundary** — cek posisi baru, bukan posisi lama
+
+**Jangan pakai `==` untuk boundary check:**
+```cpp
+if (ballX == 0)  // BERBAHAYA — bola loncat 3px per frame, bisa skip nilai 0
+if (ballX < 0)   // BENAR — range check, tidak bisa dilewati
+```
+
+**Inisialisasi posisi awal harus valid:**
+```cpp
+// SALAH — ballX=0 langsung trigger boundary, dx balik terus
+ballX(0), radius(30)    // 0 - 30 = -30 < 0 → stuck
+
+// BENAR — mulai dari dalam area widget
+ballX(100), radius(30)  // 100 - 30 = 70 > 0 → aman
+```
+
+**16ms ≈ 60fps** — standar animasi smooth. Di bawah 30fps (>33ms) terasa patah-patah.
 
 ---
 
