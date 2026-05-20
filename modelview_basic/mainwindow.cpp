@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent)
 
     connect(btnTambah, &QPushButton::clicked, this, &MainWindow::onTambah);
     connect(btnHapus, &QPushButton::clicked, this, &MainWindow::onHapus);
+
+    central->setMouseTracking(true);
 }
 
 void MainWindow::onTambah()
@@ -50,7 +52,35 @@ void MainWindow::onHapus()
     model->removeRow(idx);
 }
 
+void MainWindow::keyPressEvent(QKeyEvent* event)
+{
+    if(event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    {
+        onTambah();
+    }else if(event->key() == Qt::Key_Delete)
+    {
+        onHapus();
+    }else {
+        QMainWindow::keyPressEvent(event);
+    }
+}
 
+void MainWindow::mouseMoveEvent(QMouseEvent* event)
+{
+    statusBar()->showMessage(QString("x: %1, y: %2").arg(event->pos().x()).arg(event->pos().y()));
+    QMainWindow::mouseMoveEvent(event);
+}
+
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+    QMessageBox::StandardButton jawab = QMessageBox::question(this, "Konfirmasi", "Yakin Mau Keluar?", QMessageBox::Yes | QMessageBox::No);
+    if(jawab == QMessageBox::Yes)
+    {
+        event->accept();
+    }else {
+        event->ignore();
+    }
+}
 
 
 

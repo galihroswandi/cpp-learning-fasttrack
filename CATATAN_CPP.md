@@ -937,6 +937,66 @@ model->removeRow(idx.row());
 - `int` — hanya row, cukup untuk list flat (QComboBox)
 - `QModelIndex` — bawa row + column + parent, support tree/table, punya `isValid()`
 
+---
+
+### Topik 4: Event Handling Lanjutan — SELESAI ✓
+
+**Project:** `modelview_basic/` — tambah keyPressEvent, mouseMoveEvent, closeEvent
+
+**Event handling via override (bukan connect):**
+| Web Event | Qt Override |
+|---|---|
+| `keydown` | `keyPressEvent(QKeyEvent* e)` |
+| `mousemove` | `mouseMoveEvent(QMouseEvent* e)` |
+| window close | `closeEvent(QCloseEvent* e)` |
+
+**Aturan wajib — panggil parent jika tidak handle sendiri:**
+```cpp
+void MyWidget::keyPressEvent(QKeyEvent* e) {
+    if (e->key() == Qt::Key_Escape) {
+        // handle sendiri
+    } else {
+        QMainWindow::keyPressEvent(e);  // WAJIB — supaya Tab, Space, dll tetap jalan
+    }
+}
+```
+Tanpa memanggil parent: semua key yang tidak kamu tangkap jadi "ditelan" — Tab, Space, shortcut bawaan Qt semua mati.
+
+**closeEvent — accept vs ignore:**
+```cpp
+void MainWindow::closeEvent(QCloseEvent* event) {
+    if (yakinKeluar) event->accept();  // window ditutup
+    else             event->ignore();  // window tetap terbuka, seolah X tidak ditekan
+}
+```
+Padanan JS: `window.confirm()` — dialog yes/no yang memblok.
+
+**Mouse tracking — tidak aktif secara default:**
+```cpp
+// Default: mouseMoveEvent hanya dipanggil saat tombol mouse ditekan (drag)
+// Untuk tracking bebas:
+setMouseTracking(true);           // untuk MainWindow
+central->setMouseTracking(true);  // untuk central widget
+```
+
+**Event Filter — intercept event dari child widget:**
+```cpp
+// Di constructor:
+central->installEventFilter(this);
+
+// Implementasi:
+bool MainWindow::eventFilter(QObject* obj, QEvent* event) {
+    if (event->type() == QEvent::MouseMove) {
+        QMouseEvent* me = static_cast<QMouseEvent*>(event);
+        statusBar()->showMessage(QString("x:%1 y:%2").arg(me->pos().x()).arg(me->pos().y()));
+    }
+    return QMainWindow::eventFilter(obj, event);  // lempar ke parent
+}
+```
+Di Qt, event tidak otomatis bubble ke parent seperti di web — pakai event filter untuk intercept event dari child.
+
+---
+
 **Kapan pakai Model/View:**
 - List, tabel, tree dari data yang bisa berubah
 - Data yang sama perlu tampil di beberapa tempat sekaligus

@@ -9,6 +9,11 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QComboBox>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QCloseEvent>
+#include <QMessageBox>
+#include <QStatusBar>
 
 class MainWindow: public QMainWindow
 {
@@ -16,6 +21,11 @@ class MainWindow: public QMainWindow
 
 public:
     explicit MainWindow(QWidget* parent = nullptr);
+
+protected:
+    void keyPressEvent(QKeyEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void closeEvent(QCloseEvent* event) override;
 
 private slots:
     void onTambah();
