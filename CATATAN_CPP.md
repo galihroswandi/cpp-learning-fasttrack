@@ -892,6 +892,58 @@ ballX(100), radius(30)  // 100 - 30 = 70 > 0 → aman
 
 ---
 
+### Topik 3: Model/View Architecture — SELESAI ✓
+
+**Project:** `modelview_basic/` — list kota dengan tambah/hapus, dua view satu model
+
+**Tiga peran:**
+| Peran | Tanggung jawab | Padanan JS |
+|---|---|---|
+| **Model** | Simpan dan kelola data | Array / state |
+| **View** | Tampilkan data dari model | Komponen React |
+| **Delegate** | Kontrol cara tiap item dirender | Custom cell renderer |
+
+**Flow kerja:**
+```
+Model punya data → View tanya model → View render
+Data berubah → Model emit signal → Semua view terhubung update otomatis
+```
+
+**Koneksi model ke view — satu baris:**
+```cpp
+listView->setModel(model);   // view subscribe ke semua perubahan model
+comboBox->setModel(model);   // view kedua, data sama, tampilan berbeda
+// Tambah/hapus di model → kedua view update otomatis via signal/slot
+```
+
+**Operasi model:**
+```cpp
+// Tambah item di akhir
+int row = model->rowCount();
+model->insertRow(row);
+model->setData(model->index(row), teks);
+
+// Hapus item — selalu guard dulu
+int idx = comboBox->currentIndex();
+if (idx < 0) return;          // guard: model kosong → idx = -1
+model->removeRow(idx);
+
+QModelIndex idx = listView->currentIndex();
+if (!idx.isValid()) return;   // guard: tidak ada yang dipilih
+model->removeRow(idx.row());
+```
+
+**`QModelIndex` vs `int`:**
+- `int` — hanya row, cukup untuk list flat (QComboBox)
+- `QModelIndex` — bawa row + column + parent, support tree/table, punya `isValid()`
+
+**Kapan pakai Model/View:**
+- List, tabel, tree dari data yang bisa berubah
+- Data yang sama perlu tampil di beberapa tempat sekaligus
+- Jangan pakai untuk satu `QLabel` statis — terlalu overkill
+
+---
+
 ## Tips Umum
 
 ### Compile flags berguna
