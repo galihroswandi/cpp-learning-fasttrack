@@ -817,6 +817,58 @@ progressBar->setRange(0, 100);  // determinate — tahu progress, pakai setValue
 
 ---
 
+## Fase 4 — Expert {#fase-4}
+
+### Topik 1 — Custom Widget {#f4t1}
+**Project:** `custom_widget/` — tombol lingkaran dengan hover effect dan custom color
+
+**4 method yang di-override untuk custom widget interaktif:**
+```cpp
+void paintEvent(QPaintEvent*)    override;  // gambar widget
+void enterEvent(QEnterEvent*)    override;  // mouse masuk → hover=true
+void leaveEvent(QEvent*)         override;  // mouse keluar → hover=false
+void mousePressEvent(QMouseEvent*)   override;  // tombol mouse ditekan
+void mouseReleaseEvent(QMouseEvent*) override;  // tombol mouse dilepas → emit clicked()
+```
+
+**Pattern state-based rendering:**
+```cpp
+// State sebagai member
+bool hovered = false;
+bool pressed = false;
+
+// Event → ubah state → update()
+void enterEvent(QEnterEvent* e) {
+    hovered = true;
+    update();               // trigger paintEvent
+    QWidget::enterEvent(e); // lempar ke parent
+}
+
+// paintEvent baca state → tentukan tampilan
+void paintEvent(QPaintEvent*) {
+    QColor bg = baseColor;
+    if (pressed)      bg = baseColor.darker(140);
+    else if (hovered) bg = baseColor.lighter(120);
+    painter.setBrush(bg);
+}
+```
+
+**Poin penting:**
+- `sizeHint()` WAJIB di-override — tanpanya widget muncul ukuran 0×0 (tidak terlihat)
+- `mouseReleaseEvent` harus cek `&& pressed` — cegah klik yang dimulai dari luar button
+- Cursor harus dikembalikan di `leaveEvent` — jangan biarkan cursor berubah permanen
+- `darker(n)` dan `lighter(n)` — ubah kecerahan QColor, n > 100 = lebih gelap/terang
+
+```cpp
+// Constructor menerima warna sebagai parameter
+CircleButton(const QString& text, QColor color, QWidget* parent = nullptr);
+
+// sizeHint — rekomendasi ukuran ke layout system
+QSize sizeHint() const override { return QSize(120, 120); }
+```
+
+---
+
 ## Tips Umum {#tips}
 
 ### CMake — Cara Tambah Qt Module
