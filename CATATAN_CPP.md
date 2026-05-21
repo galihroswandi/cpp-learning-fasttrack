@@ -1108,6 +1108,62 @@ QString path = QFileDialog::getSaveFileName(this, "Judul", "", "Text (*.txt)");
 
 ---
 
+### Topik 8: Multithreading dengan QtConcurrent — SELESAI ✓
+
+**Project:** `thread_basic/` — task berat 5 detik di background tanpa freeze UI
+
+**CMake — tambah Concurrent:**
+```cmake
+find_package(Qt6 REQUIRED COMPONENTS Widgets Concurrent)
+target_link_libraries(app PRIVATE Qt6::Widgets Qt6::Concurrent)
+```
+
+**Pattern QtConcurrent:**
+```cpp
+// Fungsi yang jalan di background — jangan akses widget dari sini!
+static int tugasBerat() {
+    QThread::sleep(5);  // simulasi proses berat
+    return 42;
+}
+
+// Setup watcher di constructor
+watcher = new QFutureWatcher<int>(this);
+connect(watcher, &QFutureWatcher<int>::finished, this, &MainWindow::onSelesai);
+
+// Jalankan di background — tidak blocking
+QFuture<int> future = QtConcurrent::run(tugasBerat);
+watcher->setFuture(future);
+
+// Ambil hasil setelah selesai — aman diakses di UI thread
+void onSelesai() {
+    int hasil = watcher->result();
+    label->setText(QString::number(hasil));
+}
+```
+
+**Aturan penting — thread safety:**
+- Widget Qt **tidak thread-safe** — semua operasi widget WAJIB di UI thread
+- Fungsi background DILARANG memanggil `label->setText()` atau widget apapun
+- `QFutureWatcher::finished` emit di UI thread — aman untuk update widget di sini
+- `QFutureWatcher` = jembatan antara background thread dan UI thread
+
+**Progress bar:**
+```cpp
+progressBar->setRange(0, 0);    // indeterminate — tidak tahu berapa persen, animasi bouncing
+progressBar->setRange(0, 100);  // determinate — tahu progress, pakai setValue(n)
+progressBar->setValue(50);      // 50%
+```
+
+**QThread vs QtConcurrent:**
+| | `QtConcurrent` | `QThread` |
+|---|---|---|
+| Level | High-level | Low-level |
+| Penggunaan | Satu fungsi di background | Thread dengan lifecycle penuh |
+| Kode | Satu baris | Banyak setup |
+| Cocok untuk | Task sederhana | Task kompleks, ongoing |
+
+---
+
 ### Topik 7: Networking — SELESAI ✓
 
 **Project:** `networking_basic/` — HTTP GET ke httpbin.org dengan QNetworkAccessManager
