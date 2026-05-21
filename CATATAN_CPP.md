@@ -939,47 +939,6 @@ model->removeRow(idx.row());
 
 ---
 
-### Topik 5: QSS / Theming — SELESAI ✓
-
-**Project:** `qss_basic/` — dark/light theme toggle dengan QSS
-
-**Tiga cara apply QSS (luas ke sempit):**
-```cpp
-qApp->setStyleSheet("...");         // seluruh app
-mainWindow->setStyleSheet("...");   // window + semua child
-button->setStyleSheet("...");       // widget ini saja (≈ inline style di CSS)
-```
-
-**Selector QSS:**
-```css
-QPushButton { }              /* semua QPushButton */
-QPushButton:hover { }        /* pseudo-state — WAJIB ditulis eksplisit, tidak ada default */
-QPushButton:pressed { }
-QPushButton#btnDanger { }    /* hanya widget dengan objectName "btnDanger" */
-```
-
-**Spesifisitas:** `#objectName` > `WidgetType` > inherited dari parent
-
-**setObjectName — wajib untuk selector `#id`:**
-```cpp
-btnDanger->setObjectName("btnDanger");  // baru bisa pakai QPushButton#btnDanger di QSS
-```
-
-**Raw string literal untuk QSS panjang:**
-```cpp
-setStyleSheet(R"(
-    QPushButton { border-radius: 6px; }
-)");
-// R"(...)" = padanan template literal JS ` ` — bisa multiline, tidak perlu \n
-```
-
-**Perbedaan dari CSS web:**
-- Pseudo-state (`hover`, `pressed`) tidak ada default visual — harus ditulis semua
-- `border-radius` butuh `border` juga dideklarasikan
-- Tidak ada class selector (`.class`) — pakai `#objectName` sebagai gantinya
-
----
-
 ### Topik 4: Event Handling Lanjutan — SELESAI ✓
 
 **Project:** `modelview_basic/` — tambah keyPressEvent, mouseMoveEvent, closeEvent
@@ -1035,6 +994,117 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event) {
 }
 ```
 Di Qt, event tidak otomatis bubble ke parent seperti di web — pakai event filter untuk intercept event dari child.
+
+---
+
+### Topik 5: QSS / Theming — SELESAI ✓
+
+**Project:** `qss_basic/` — dark/light theme toggle dengan QSS
+
+**Tiga cara apply QSS (luas ke sempit):**
+```cpp
+qApp->setStyleSheet("...");         // seluruh app
+mainWindow->setStyleSheet("...");   // window + semua child
+button->setStyleSheet("...");       // widget ini saja (≈ inline style di CSS)
+```
+
+**Selector QSS:**
+```css
+QPushButton { }              /* semua QPushButton */
+QPushButton:hover { }        /* pseudo-state — WAJIB ditulis eksplisit, tidak ada default */
+QPushButton:pressed { }
+QPushButton#btnDanger { }    /* hanya widget dengan objectName "btnDanger" */
+```
+
+**Spesifisitas:** `#objectName` > `WidgetType` > inherited dari parent
+
+**setObjectName — wajib untuk selector `#id`:**
+```cpp
+btnDanger->setObjectName("btnDanger");  // baru bisa pakai QPushButton#btnDanger di QSS
+```
+
+**Raw string literal untuk QSS panjang:**
+```cpp
+setStyleSheet(R"(
+    QPushButton { border-radius: 6px; }
+)");
+// R"(...)" = padanan template literal JS ` ` — bisa multiline, tidak perlu \n
+```
+
+**Perbedaan dari CSS web:**
+- Pseudo-state (`hover`, `pressed`) tidak ada default visual — harus ditulis semua
+- `border-radius` butuh `border` juga dideklarasikan
+- Tidak ada class selector (`.class`) — pakai `#objectName` sebagai gantinya
+
+---
+
+### Topik 6: File I/O — SELESAI ✓
+
+**Project:** `fileio_basic/` — text editor sederhana dengan buka/simpan file
+
+**Dua class utama:**
+- `QFile` — handle file (open, close, exists, remove)
+- `QTextStream` — baca/tulis teks (seperti readline di Node.js)
+
+**Pattern baca file:**
+```cpp
+QFile file(path);
+if (!file.open(QFile::ReadOnly | QFile::Text)) return;  // selalu cek!
+QTextStream in(&file);
+editor->setPlainText(in.readAll());
+file.close();
+```
+
+**Pattern tulis file:**
+```cpp
+QFile file(path);
+if (!file.open(QFile::WriteOnly | QFile::Text)) return;
+QTextStream out(&file);
+out << editor->toPlainText();
+file.close();
+editor->document()->setModified(false);  // reset flag setelah simpan
+```
+
+**`QFile::Text` — konversi line ending antar OS:**
+- Windows: `\r\n`, Linux/Mac: `\n`
+- Dengan `Text`: Qt auto-konversi saat baca/tulis
+- Tanpa `Text`: karakter `\r` ekstra muncul di akhir setiap baris
+
+**Save vs Save As pattern:**
+```cpp
+void onSimpan() {
+    if (filePath.isEmpty()) {
+        // belum punya file → Save As (muncul dialog)
+        filePath = QFileDialog::getSaveFileName(...);
+        if (filePath.isEmpty()) return;
+    }
+    // sudah punya file → Save langsung tanpa dialog
+    // tulis ke filePath
+}
+```
+
+**closeEvent + isModified:**
+```cpp
+void MainWindow::closeEvent(QCloseEvent* event) {
+    if (editor->document()->isModified()) {
+        // tanya user
+        if (yakin) { onSimpan(); event->accept(); }
+        else        { event->ignore(); }  // batalkan close
+    } else {
+        event->accept();  // tidak ada perubahan, langsung tutup
+    }
+}
+// PENTING: setModified(false) setelah simpan — tidak reset otomatis!
+```
+
+**File dialog:**
+```cpp
+// Buka
+QString path = QFileDialog::getOpenFileName(this, "Judul", "", "Text (*.txt);;All (*)");
+// Simpan
+QString path = QFileDialog::getSaveFileName(this, "Judul", "", "Text (*.txt)");
+// Selalu cek isEmpty() — return "" kalau user cancel
+```
 
 ---
 
