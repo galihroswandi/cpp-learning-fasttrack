@@ -1108,6 +1108,63 @@ QString path = QFileDialog::getSaveFileName(this, "Judul", "", "Text (*.txt)");
 
 ---
 
+### Topik 7: Networking — SELESAI ✓
+
+**Project:** `networking_basic/` — HTTP GET ke httpbin.org dengan QNetworkAccessManager
+
+**CMake — wajib tambah Network module:**
+```cmake
+find_package(Qt6 REQUIRED COMPONENTS Widgets Network)
+target_link_libraries(app PRIVATE Qt6::Widgets Qt6::Network)
+```
+
+**Tiga class utama:**
+- `QNetworkAccessManager` — satu instance per app, seperti `fetch` itu sendiri
+- `QNetworkRequest` — berisi URL dan headers
+- `QNetworkReply` — response object, emit signal `finished` saat data datang
+
+**Pattern request:**
+```cpp
+// Setup — satu kali di constructor
+manager = new QNetworkAccessManager(this);
+connect(manager, &QNetworkAccessManager::finished,
+        this, &MainWindow::onReplyFinished);  // fired untuk SETIAP reply
+
+// Send request — tidak blocking, langsung return
+QNetworkRequest request;
+request.setUrl(QUrl("https://api.example.com/data"));
+manager->get(request);
+```
+
+**Pattern handle response:**
+```cpp
+void MainWindow::onReplyFinished(QNetworkReply* reply) {
+    if (reply->error() != QNetworkReply::NoError) {
+        // handle error
+        reply->deleteLater();  // WAJIB di setiap exit path
+        return;
+    }
+    QString data = QString::fromUtf8(reply->readAll());
+    reply->deleteLater();  // deleteLater, bukan delete — masih di call stack Qt
+}
+```
+
+**Penting:**
+- `manager->get()` ≈ `fetch()` tanpa `await` — async, tidak blocking
+- `finished` signal dipanggil untuk **setiap** reply — termasuk kalau ada 2 request bersamaan
+- `deleteLater()` bukan `delete` — reply masih di call stack saat slot dipanggil
+- Disable tombol saat request in-flight untuk cegah double request
+
+**Padanan JS:**
+| JavaScript | Qt |
+|---|---|
+| `fetch(url)` | `manager->get(QNetworkRequest(url))` |
+| `.then(res => res.text())` | `connect(manager, &QNAM::finished, slot)` |
+| `res.ok` | `reply->error() == NoError` |
+| `res.text()` | `QString::fromUtf8(reply->readAll())` |
+
+---
+
 **Kapan pakai Model/View:**
 - List, tabel, tree dari data yang bisa berubah
 - Data yang sama perlu tampil di beberapa tempat sekaligus
