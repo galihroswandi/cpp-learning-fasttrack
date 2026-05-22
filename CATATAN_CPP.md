@@ -869,6 +869,62 @@ QSize sizeHint() const override { return QSize(120, 120); }
 
 ---
 
+### Topik 2 — Database dengan QtSql {#f4t2}
+**Project:** `database_basic/`
+
+```cmake
+find_package(Qt6 REQUIRED COMPONENTS Widgets Sql)
+target_link_libraries(app PRIVATE Qt6::Widgets Qt6::Sql)
+```
+
+**Setup koneksi:**
+```cpp
+db = QSqlDatabase::addDatabase("QSQLITE");  // driver SQLite
+db.setDatabaseName("kapal.db");             // file di direktori kerja app
+if (!db.open()) { /* error */ return; }
+
+// Buat tabel — IF NOT EXISTS supaya tidak crash saat buka kedua kali
+QSqlQuery query;
+query.exec("CREATE TABLE IF NOT EXISTS kapal ("
+           "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+           "nama TEXT NOT NULL)");
+```
+
+**QSqlTableModel — tampilkan data di view:**
+```cpp
+model = new QSqlTableModel(this, db);
+model->setTable("kapal");
+model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+model->select();
+listView->setModel(model);
+listView->setModelColumn(1);  // kolom 0=id, kolom 1=nama
+```
+
+**INSERT — pakai QSqlQuery langsung:**
+```cpp
+QSqlQuery query;
+query.prepare("INSERT INTO kapal (nama) VALUES (:nama)");
+query.bindValue(":nama", nama);  // prepared statement — aman dari SQL injection
+query.exec();
+model->select();  // refresh tampilan
+```
+
+**DELETE — pakai model:**
+```cpp
+model->removeRow(idx.row());
+model->submitAll();  // WAJIB untuk OnManualSubmit — tanpa ini tidak ditulis ke DB
+model->select();
+```
+
+**Poin penting:**
+- SQLite = file `.db`, tidak butuh server — backup cukup copy file
+- `IF NOT EXISTS` wajib di CREATE TABLE — tanpanya crash saat buka kedua kali
+- Prepared statement (`:placeholder`) mencegah SQL injection
+- `kapal.db` tersimpan di folder `build/` saat dijalankan dari Qt Creator
+- `OnManualSubmit` = perubahan ditahan di memory sampai `submitAll()` dipanggil
+
+---
+
 ## Tips Umum {#tips}
 
 ### CMake — Cara Tambah Qt Module
