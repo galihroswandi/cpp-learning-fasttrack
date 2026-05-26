@@ -925,6 +925,50 @@ model->select();
 
 ---
 
+### Topik 3 — Plugin System (referensi) {#f4t3}
+
+Plugin system memungkinkan load kode saat **runtime** — tanpa recompile app utama.
+
+**Kapan dibutuhkan:** app yang perlu diperluas oleh orang lain tanpa akses source code utama. Contoh: VSCode extensions, browser plugins.
+
+**Konsep kunci:**
+- **Interface** — abstract class, kontrak antara app dan plugin (`Q_DECLARE_INTERFACE`)
+- **Plugin** — implement interface, dikompile sebagai `.so` terpisah (`Q_PLUGIN_METADATA`)
+- **App** — load `.so` saat runtime via `QPluginLoader`
+
+```cpp
+// Interface — shared antara app dan plugin
+class ITranslator {
+public:
+    virtual ~ITranslator() {}
+    virtual QString translate(const QString& text) const = 0;
+};
+Q_DECLARE_INTERFACE(ITranslator, "com.app.ITranslator/1.0")
+
+// Plugin — dikompile sebagai shared library terpisah
+class EnglishPlugin : public QObject, public ITranslator {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "com.app.ITranslator/1.0")
+    Q_INTERFACES(ITranslator)
+public:
+    QString translate(const QString& text) const override { ... }
+};
+
+// App — load plugin saat runtime
+QPluginLoader loader("./libplugin_english.so");
+ITranslator* plugin = qobject_cast<ITranslator*>(loader.instance());
+```
+
+**Perbedaan library vs plugin:**
+- Library → dimasukkan saat **compile time**, sudah fix di executable
+- Plugin → dimasukkan saat **runtime**, app bisa load `.so` dari luar tanpa recompile
+
+---
+
+## Fase 5 — Capstone {#fase-5}
+
+---
+
 ## Tips Umum {#tips}
 
 ### CMake — Cara Tambah Qt Module
