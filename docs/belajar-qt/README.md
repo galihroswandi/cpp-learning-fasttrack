@@ -66,8 +66,8 @@ Topik 1-25 diarsipkan dari `CATATAN_CPP.md` (catatan awal dalam 1 file panjang).
 | No | Topik | Status | File |
 |----|-------|--------|------|
 | 26 | Qt Resource System (QRC) | ✅ | [topik-26-qrc.md](topik-26-qrc.md) |
-| 27 | QPixmap, QImage, QIcon | 🔄 | — |
-| 28 | QFont & tipografi | ⏳ | — |
+| 27 | QPixmap, QImage, QIcon | ✅ | [topik-27-qpixmap-qimage-qicon.md](topik-27-qpixmap-qimage-qicon.md) |
+| 28 | QFont & tipografi | 🔄 | — |
 | 29 | Qt Internationalization (i18n) | ⏳ | — |
 | 30 | Qt Accessibility | ⏳ | — |
 
