@@ -67,9 +67,10 @@ Topik 1-25 diarsipkan dari `CATATAN_CPP.md` (catatan awal dalam 1 file panjang).
 |----|-------|--------|------|
 | 26 | Qt Resource System (QRC) | ✅ | [topik-26-qrc.md](topik-26-qrc.md) |
 | 27 | QPixmap, QImage, QIcon | ✅ | [topik-27-qpixmap-qimage-qicon.md](topik-27-qpixmap-qimage-qicon.md) |
-| 28 | QFont & tipografi | 🔄 | — |
-| 29 | Qt Internationalization (i18n) | ⏳ | — |
+| 28 | QFont & tipografi | ✅ | [topik-28-qfont-tipografi.md](topik-28-qfont-tipografi.md) |
+| 29 | Qt Internationalization (i18n) | 🔄 | — |
 | 30 | Qt Accessibility | ⏳ | — |
+| 🎯 | **Mini-Project Fase 6**: Image Gallery + Theming + Multi-bahasa | ⏳ | — |
 
 ## Fase 7 — Qt Graphics & Visual Lanjutan
 
@@ -80,6 +81,7 @@ Topik 1-25 diarsipkan dari `CATATAN_CPP.md` (catatan awal dalam 1 file panjang).
 | 33 | Qt Charts | ⏳ | — |
 | 34 | Qt Data Visualization (3D) | ⏳ | — |
 | 35 | Animasi lanjutan (QStateMachine) | ⏳ | — |
+| 🎯 | **Mini-Project Fase 7**: Stock Dashboard Interaktif (Charts + Graphics View + animasi) | ⏳ | — |
 
 ## Fase 8 — Qt System & Platform
 
@@ -90,6 +92,7 @@ Topik 1-25 diarsipkan dari `CATATAN_CPP.md` (catatan awal dalam 1 file panjang).
 | 38 | QClipboard | ⏳ | — |
 | 39 | QDesktopServices | ⏳ | — |
 | 40 | Platform-specific code | ⏳ | — |
+| 🎯 | **Mini-Project Fase 8**: Clipboard Manager dengan System Tray (QProcess + QSystemTrayIcon + QClipboard) | ⏳ | — |
 
 ## Fase 9 — Qt Testing & Quality
 
@@ -100,6 +103,7 @@ Topik 1-25 diarsipkan dari `CATATAN_CPP.md` (catatan awal dalam 1 file panjang).
 | 43 | Qt Error handling | ⏳ | — |
 | 44 | Memory leak detection | ⏳ | — |
 | 45 | Qt Performance optimization | ⏳ | — |
+| 🎯 | **Mini-Project Fase 9**: Unit test + benchmark harness untuk salah satu mini-project sebelumnya | ⏳ | — |
 
 ## Fase 10 — Capstone Project Lanjutan
 
