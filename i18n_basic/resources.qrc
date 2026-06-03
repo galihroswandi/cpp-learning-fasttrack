@@ -1,0 +1,6 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/i18n">
+        <file>i18n/app_id.qm</file>
+    </qresource>
+</RCC>
