@@ -69,8 +69,8 @@ Topik 1-25 diarsipkan dari `CATATAN_CPP.md` (catatan awal dalam 1 file panjang).
 | 27 | QPixmap, QImage, QIcon | ✅ | [topik-27-qpixmap-qimage-qicon.md](topik-27-qpixmap-qimage-qicon.md) |
 | 28 | QFont & tipografi | ✅ | [topik-28-qfont-tipografi.md](topik-28-qfont-tipografi.md) |
 | 29 | Qt Internationalization (i18n) | ✅ | [topik-29-i18n.md](topik-29-i18n.md) |
-| 30 | Qt Accessibility | 🔄 | — |
-| 🎯 | **Mini-Project Fase 6**: Image Gallery + Theming + Multi-bahasa | ⏳ | — |
+| 30 | Qt Accessibility | ✅ | [topik-30-accessibility.md](topik-30-accessibility.md) |
+| 🎯 | **Mini-Project Fase 6**: Image Gallery + Theming + Multi-bahasa | 🔄 | — |
 
 ## Fase 7 — Qt Graphics & Visual Lanjutan
 

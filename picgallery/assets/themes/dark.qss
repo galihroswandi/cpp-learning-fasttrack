@@ -1,0 +1,45 @@
+/* Dark theme untuk PicGallery */
+QMainWindow, QDialog, QWidget {
+    background-color: #1e1e2e;
+    color: #cdd6f4;
+}
+
+QPushButton {
+    background-color: #313244;
+    color: #cdd6f4;
+    border: 1px solid #45475a;
+    border-radius: 6px;
+    padding: 8px 16px;
+}
+
+QPushButton:hover {
+    background-color: #45475a;
+}
+
+QPushButton:pressed {
+    background-color: #585b70;
+}
+
+QPushButton:default {
+    background-color: #89b4fa;
+    color: #1e1e2e;
+}
+
+QPushButton:focus {
+    border: 2px solid #89b4fa;
+}
+
+QListWidget {
+    background-color: #181825;
+    border: 1px solid #313244;
+    border-radius: 6px;
+}
+
+QLabel {
+    color: #cdd6f4;
+}
+
+QStatusBar {
+    background-color: #181825;
+    color: #a6adc8;
+}
