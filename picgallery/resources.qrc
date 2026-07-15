@@ -1,16 +1,18 @@
-<!DOCTYPE RCC>
-<RCC version="1.0">
+<RCC>
     <qresource prefix="/fonts">
-        <!-- TODO: tambah font Inter atau pilihan lo
-             contoh: <file alias="inter.ttf">assets/fonts/Inter-Regular.ttf</file>
-        -->
+        <file alias="regular.ttf">assets/fonts/Nunito-Regular.ttf</file>
+        <file alias="bold.ttf">assets/fonts/Nunito-Bold.ttf</file>
+        <file alias="light.ttf">assets/fonts/Nunito-Light.ttf</file>
+        <file alias="semibold.ttf">assets/fonts/Nunito-SemiBold.ttf</file>
     </qresource>
     <qresource prefix="/themes">
         <file alias="dark.qss">assets/themes/dark.qss</file>
     </qresource>
-    <qresource prefix="/i18n">
-        <!-- TODO: tambah file .qm setelah lrelease jalan
-             contoh: <file>i18n/picgallery_id.qm</file>
-        -->
+    <qresource prefix="/i18n"/>
+    <qresource prefix="/icons">
+        <file alias="folder.svg">assets/icons/folder-input.svg</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file alias="empty.png">assets/images/empty-image.png</file>
     </qresource>
 </RCC>

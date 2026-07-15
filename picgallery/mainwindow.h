@@ -22,6 +22,9 @@
 // - Topik 30 (a11y): setAccessibleName, setBuddy, setTabOrder
 
 #include <QWidget>
+#include <QPushButton>
+#include <QLabel>
+#include <QPaintEvent>
 
 // TODO: include yang lo butuhkan
 
@@ -33,18 +36,25 @@ public:
 signals:
     void changeLanguageRequested(const QString& code);
 
-protected:
-    void changeEvent(QEvent* e) override;
+// protected:
+//     void changeEvent(QEvent* e) override;
 
-private slots:
-    void onOpenFolder();
-    void onThumbnailClicked(/* TODO: parameter sesuai signal yang lo connect */);
+// private slots:
+//     void onOpenFolder();
+//     void onThumbnailClicked(/* TODO: parameter sesuai signal yang lo connect */);
 
 private:
-    void retranslateUi();
-    void loadFolder(const QString& path);
+//     void retranslateUi();
+//     void loadFolder(const QString& path);
+    QWidget* buildTopBar();
+    QWidget* buildEmptyWidget();
+    QWidget* buildFooter();
+    void applyStyle();
 
     // TODO: deklarasi member widget (button, list, dll)
+    QPushButton* btnAddFile;
+    QPushButton* btnEN;
+    QPushButton* btnID;
 };
 
 #endif

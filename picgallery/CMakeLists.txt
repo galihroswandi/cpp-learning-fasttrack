@@ -16,6 +16,9 @@ add_executable(picgallery
     mainwindow.h
     fullview.h
     resources.qrc
+    loadfont.h
+    mainwindow.cpp
+    theme.h
 )
 
 qt_add_translations(picgallery TS_FILES ${TS_FILES})
