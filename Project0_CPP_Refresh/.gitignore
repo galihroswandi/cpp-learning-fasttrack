@@ -1,7 +1,0 @@
-# Build artifacts
-build/
-
-# Output files generated saat runtime (dibuat oleh 04_fileio)
-src/*.txt
-src/*.csv
-src/*.bin
