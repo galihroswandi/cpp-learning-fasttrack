@@ -1,6 +1,6 @@
 # Topik 16 — Model/View Architecture
 Diarsipkan: 2026-05-29 (dari CATATAN_CPP.md — Fase 2 Topik 3)
-Project: [modelview_basic/](../../modelview_basic/)
+Project: [modelview_basic/](../../fase-2-intermediate/16-17-model-view-event-handling/)
 
 ## Ringkasan konsep
 Model/View memisahkan **data** dari **tampilan**. Model nyimpen data dan emit signal saat berubah; View tinggal subscribe ke model dan auto-update. Satu model bisa di-attach ke banyak view (`QListView` + `QComboBox`) — semua sync otomatis tanpa boilerplate. Ini analog dengan state management React: model = state store, view = component yang subscribe.

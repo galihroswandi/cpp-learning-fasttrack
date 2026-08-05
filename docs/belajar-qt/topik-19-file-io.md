@@ -1,6 +1,6 @@
 # Topik 19 — File I/O
 Diarsipkan: 2026-05-29 (dari CATATAN_CPP.md — Fase 3 Topik 6)
-Project: [fileio_basic/](../../fileio_basic/)
+Project: [fileio_basic/](../../fase-3-advanced/19-file-io/)
 
 ## Ringkasan konsep
 Qt punya `QFile` + `QTextStream` untuk baca/tulis text file dengan handling cross-platform line ending. Flag `QFile::Text` penting — auto-convert `\r\n` (Windows) ↔ `\n` (Unix). Selalu cek `file.open()` return value sebelum operasi. Pattern app editor standar: track `document()->isModified()` untuk Save (langsung tulis kalau path ada) vs Save As (selalu show file dialog). `closeEvent` cek modified → tanya user simpan dulu.

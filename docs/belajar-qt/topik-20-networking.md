@@ -1,6 +1,6 @@
 # Topik 20 — Networking
 Diarsipkan: 2026-05-29 (dari CATATAN_CPP.md — Fase 3 Topik 7)
-Project: [networking_basic/](../../networking_basic/)
+Project: [networking_basic/](../../fase-3-advanced/20-networking/)
 
 ## Ringkasan konsep
 `QNetworkAccessManager` (QNAM) = `fetch` di Qt — async, non-blocking. Satu QNAM per app sudah cukup. Pakai signal `finished` untuk handle response (dipanggil untuk **setiap reply**). Wajib `reply->deleteLater()` di setiap exit path supaya gak leak. Untuk pakai module Network, tambah di CMake: `find_package(Qt6 COMPONENTS Network)` + `target_link_libraries(... Qt6::Network)`.

@@ -2,7 +2,9 @@
 
 Catatan terstruktur dari belajar Qt dengan format 7 langkah: KONSEP → ATURAN → KODE MINIMAL → JALANKAN → BEDAH BARIS → EKSPERIMEN → CEK PAHAM.
 
-Topik 1-25 diarsipkan dari `CATATAN_CPP.md` (catatan awal dalam 1 file panjang). Topik 26+ direkam langsung mengikuti format ini.
+Topik 1-25 diarsipkan dari `CATATAN_CPP.md` (sekarang di [docs/archive/CATATAN_CPP.md](archive/CATATAN_CPP.md) — catatan awal dalam 1 file panjang). Topik 26+ direkam langsung mengikuti format ini.
+
+Folder project fisik untuk tiap topik ada di `fase-N-.../NN-nama-topik/` di root repo — lihat **[README index utama](../../README.md)** untuk peta lengkap topik → folder.
 
 ## Fase 1 — C++ Dasar & Qt Dasar (Foundation)
 

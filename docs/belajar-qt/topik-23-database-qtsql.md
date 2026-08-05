@@ -1,6 +1,6 @@
 # Topik 23 — Database dengan QtSql
 Diarsipkan: 2026-05-29 (dari CATATAN_CPP.md — Fase 4 Topik 2)
-Project: [database_basic/](../../database_basic/)
+Project: [database_basic/](../../fase-4-expert/23-database-qtsql/)
 
 ## Ringkasan konsep
 `QtSql` module menyediakan abstraction database (SQLite, MySQL, PostgreSQL) dengan API yang sama. SQLite paling sering dipakai untuk app desktop — gak butuh server, datanya 1 file `.db`. Pakai `QSqlTableModel` kalau mau langsung attach DB table ke view (auto-sync); pakai `QSqlQuery` untuk SQL custom. **Wajib pakai prepared statement** (`:placeholder` + `bindValue`) — cegah SQL injection.

@@ -1,6 +1,6 @@
 # Topik 18 — QSS / Theming
 Diarsipkan: 2026-05-29 (dari CATATAN_CPP.md — Fase 3 Topik 5)
-Project: [qss_basic/](../../qss_basic/)
+Project: [qss_basic/](../../fase-3-advanced/18-qss-theming/)
 
 ## Ringkasan konsep
 **QSS (Qt Style Sheets)** adalah CSS untuk Qt — syntax hampir identik. Apply ke 3 level: seluruh app (`qApp->setStyleSheet`), per-window (`mainWindow->setStyleSheet`), atau per-widget (`button->setStyleSheet`, mirip inline style). Untuk pseudo-state seperti `:hover`, lo **wajib tulis eksplisit** — Qt gak punya default hover effect kayak browser. Selector class CSS (`.btn`) gak ada — pakai `#objectName` setelah `setObjectName("btnDanger")`.

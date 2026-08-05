@@ -1,6 +1,6 @@
 # Topik 11 — Challenge: Signal & Slot
 Diarsipkan: 2026-05-29 (dari CATATAN_CPP.md — Fase 1 Challenge 1)
-Project: [temp_monitor/](../../temp_monitor/)
+Project: [temp_monitor/](../../fase-1-fondasi/11-challenge-signal-slot/)
 
 ## Ringkasan konsep
 Challenge pertama: bikin sensor temperatur yang emit signal saat suhu berubah, dan display yang receive signal untuk update tampilan. Tujuannya internalize konsep loose coupling (sensor gak tau ada display) dan type-safe connection (compile-time check). Pakai `QCoreApplication` karena console-based, gak butuh widget.

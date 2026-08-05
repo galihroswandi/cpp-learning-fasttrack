@@ -1,6 +1,6 @@
 # Topik 25 — Capstone Project: Vessel Dashboard & Personal Notes
 Diarsipkan: 2026-05-29 (dari CATATAN_CPP.md — Fase 5)
-Project: [vessel_dashboard/](../../vessel_dashboard/) dan [personal_notes/](../../personal_notes/)
+Project: [vessel_dashboard/](../../fase-5-capstone/vessel_dashboard/) dan [personal_notes/](../../fase-5-capstone/personal_notes/)
 
 ## Ringkasan konsep
 Capstone fase 5 adalah integrasi semua konsep Qt fase 1-4 dalam project nyata. **Vessel Dashboard**: simulasi ECDIS sederhana — display vessel info dengan custom widget, QPainter rendering, dan signal/slot dari sensor simulator. **Personal Notes**: app catatan personal dengan QSplitter layout, SQLite CRUD lewat QtSql, dan QSS theming dark mode. Kedua project bukti bahwa konsep terpisah (widget + database + custom paint + theming) bisa dijahit jadi aplikasi utuh.
@@ -11,8 +11,8 @@ Capstone fase 5 adalah integrasi semua konsep Qt fase 1-4 dalam project nyata. *
 
 ## Kode inti
 Lihat langsung project source:
-- [vessel_dashboard/](../../vessel_dashboard/) — main.cpp, widget custom display, sensor simulator dengan QTimer.
-- [personal_notes/](../../personal_notes/) — QSplitter layout (sidebar + editor), QSqlTableModel untuk daftar note, QSS theme file.
+- [vessel_dashboard/](../../fase-5-capstone/vessel_dashboard/) — main.cpp, widget custom display, sensor simulator dengan QTimer.
+- [personal_notes/](../../fase-5-capstone/personal_notes/) — QSplitter layout (sidebar + editor), QSqlTableModel untuk daftar note, QSS theme file.
 
 Pattern utama yang dipakai:
 - `QSplitter` untuk resizable panel layout (drag handle antara sidebar dan main editor)

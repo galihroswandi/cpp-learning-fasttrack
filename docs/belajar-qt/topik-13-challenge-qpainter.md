@@ -1,6 +1,6 @@
 # Topik 13 — Challenge: QPainter
 Diarsipkan: 2026-05-29 (dari CATATAN_CPP.md — Fase 1 Challenge 3)
-Project: [qt_painter/](../../qt_painter/)
+Project: [qt_painter/](../../fase-1-fondasi/13-challenge-qpainter/)
 
 ## Ringkasan konsep
 Challenge: bikin custom widget yang gambar shape (lingkaran, garis, teks) di canvas. Tujuan: paham siklus `update()` → `paintEvent()` (sama seperti `requestAnimationFrame()` → render callback), dan kenapa `fillRect` di awal paintEvent penting (= clear frame sebelumnya, mirip `clearRect` di Canvas web).

@@ -1,6 +1,6 @@
 # Topik 17 — Event Handling Lanjutan
 Diarsipkan: 2026-05-29 (dari CATATAN_CPP.md — Fase 2 Topik 4)
-Project: [modelview_basic/](../../modelview_basic/)
+Project: [modelview_basic/](../../fase-2-intermediate/16-17-model-view-event-handling/)
 
 ## Ringkasan konsep
 Event di Qt **gak datang lewat `connect()`** — tapi lewat **override method** spesifik di widget (`keyPressEvent`, `mouseMoveEvent`, `closeEvent`, dll). Setelah handle event, **wajib lempar ke parent** (`QMainWindow::keyPressEvent(e)`) supaya event default Qt (Tab navigation, shortcut, dll) tetap jalan. Untuk intercept event dari child widget, pakai **event filter** (`installEventFilter`) karena Qt **tidak otomatis bubble event** ke parent seperti DOM.

@@ -1,6 +1,6 @@
 # Topik 12 — Challenge: Widget & Layout
 Diarsipkan: 2026-05-29 (dari CATATAN_CPP.md — Fase 1 Challenge 2)
-Project: [temp_conversion/](../../temp_conversion/)
+Project: [temp_conversion/](../../fase-1-fondasi/12-challenge-widget-layout/)
 
 ## Ringkasan konsep
 Challenge: bikin GUI converter suhu Celsius → Fahrenheit dengan `QLineEdit` (input), `QPushButton` (trigger), dan `QLabel` (output). Layout: vertical untuk top-level, horizontal nested untuk row tombol. Kunci: validasi input pakai `QDoubleValidator` supaya user gak bisa ketik huruf, dan paham **type promotion** di C++ (`9/5` = 1 integer division, `9.0/5` = 1.8 double).

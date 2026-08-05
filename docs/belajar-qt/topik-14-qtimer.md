@@ -1,6 +1,6 @@
 # Topik 14 — QTimer
 Diarsipkan: 2026-05-29 (dari CATATAN_CPP.md — Fase 2 Topik 1)
-Project: [timer_basic/](../../timer_basic/)
+Project: [timer_basic/](../../fase-2-intermediate/14-qtimer/)
 
 ## Ringkasan konsep
 `QTimer` adalah padanan `setInterval`/`setTimeout` di JavaScript — emit signal `timeout` setiap interval tertentu (ms). Untuk timer berulang, pakai `timer->start(ms)` + connect signal `timeout`. Untuk timer sekali, pakai `QTimer::singleShot()`. **Jangan pakai `sleep()`** untuk delay di Qt — itu membekukan event loop, semua UI freeze. **Lambda capture** wajib eksplisit di C++ (beda dari closure otomatis JS) — pakai `[this]` supaya bisa akses member class.

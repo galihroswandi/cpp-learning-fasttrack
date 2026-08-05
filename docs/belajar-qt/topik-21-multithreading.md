@@ -1,6 +1,6 @@
 # Topik 21 — Multithreading dengan QtConcurrent
 Diarsipkan: 2026-05-29 (dari CATATAN_CPP.md — Fase 3 Topik 8)
-Project: [thread_basic/](../../thread_basic/)
+Project: [thread_basic/](../../fase-3-advanced/21-multithreading/)
 
 ## Ringkasan konsep
 **Widget Qt tidak thread-safe** — semua operasi widget WAJIB di UI thread (main thread). Untuk task berat (network call, kalkulasi panjang, file IO besar), pakai `QtConcurrent::run()` yang offload ke thread pool. Hasil di-bridge balik ke UI thread lewat `QFutureWatcher` + signal `finished`. Alternative high-level vs low-level: `QtConcurrent` untuk task sederhana satu shot; `QThread` kalau butuh kontrol lifecycle thread penuh.

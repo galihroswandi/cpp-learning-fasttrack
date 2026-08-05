@@ -1,6 +1,6 @@
 # Topik 15 — Animasi: QTimer + QPainter
 Diarsipkan: 2026-05-29 (dari CATATAN_CPP.md — Fase 2 Topik 2)
-Project: [ball_animation/](../../ball_animation/)
+Project: [ball_animation/](../../fase-2-intermediate/15-animasi-timer-painter/)
 
 ## Ringkasan konsep
 Kombinasi `QTimer` + `paintEvent` = pattern animasi standar di Qt. Siklus: timer tick (16ms ≈ 60fps) → slot update state (posisi, velocity) → `update()` schedule paintEvent → frame baru digambar. Pakai **velocity vector** (`dx`, `dy`) bukan string arah (`"left"`, `"right"`) — lebih mudah handle pantulan: tinggal balik tanda (`dx = -dx`).

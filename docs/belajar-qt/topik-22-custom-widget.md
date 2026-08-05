@@ -1,6 +1,6 @@
 # Topik 22 — Custom Widget
 Diarsipkan: 2026-05-29 (dari CATATAN_CPP.md — Fase 4 Topik 1)
-Project: [custom_widget/](../../custom_widget/)
+Project: [custom_widget/](../../fase-4-expert/22-custom-widget/)
 
 ## Ringkasan konsep
 Custom widget = subclass `QWidget` + override `paintEvent` (drawing) + event methods (interaktivitas). Pattern: **state member** (`hovered`, `pressed`) di-update dari event method → `update()` → `paintEvent` baca state → render sesuai state. Wajib override `sizeHint()` — tanpanya widget muncul 0×0 di layout system. Setiap event method harus panggil parent (`QWidget::enterEvent(e)`) supaya event chain Qt tetap jalan.
