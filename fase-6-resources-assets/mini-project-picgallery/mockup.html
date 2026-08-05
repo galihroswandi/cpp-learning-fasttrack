@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PicGallery — UI Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --base: #1e1e2e;
+    --mantle: #181825;
+    --crust: #11111b;
+    --surface0: #313244;
+    --surface1: #45475a;
+    --surface2: #585b70;
+    --text: #cdd6f4;
+    --subtext: #a6adc8;
+    --blue: #89b4fa;
+    --green: #a6e3a1;
+    --yellow: #f9e2af;
+    --red: #f38ba8;
+    --mauve: #cba6f7;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px;
+    background: var(--crust);
+    color: var(--text);
+    font-family: 'Nunito', 'Inter', sans-serif;
+    line-height: 1.5;
+  }
+
+  h1 {
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .lead { color: var(--subtext); margin-bottom: 32px; }
+
+  .section-title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--subtext);
+    margin: 40px 0 12px 0;
+    font-weight: 700;
+  }
+
+  /* === Mock window frame === */
+  .window {
+    background: var(--base);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    margin-bottom: 24px;
+  }
+
+  .titlebar {
+    background: var(--mantle);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--surface0);
+  }
+
+  .traffic {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--red);
+  }
+  .traffic.yellow { background: var(--yellow); }
+  .traffic.green { background: var(--green); }
+
+  .title {
+    flex: 1;
+    text-align: center;
+    color: var(--subtext);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* === Toolbar === */
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--mantle);
+    border-bottom: 1px solid var(--surface0);
+    align-items: center;
+  }
+
+  .toolbar-spacer { flex: 1; }
+
+  .btn {
+    background: var(--surface0);
+    color: var(--text);
+    border: 1px solid var(--surface1);
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+  .btn:hover { background: var(--surface1); }
+  .btn.primary {
+    background: var(--blue);
+    color: var(--base);
+    border-color: var(--blue);
+    font-weight: 600;
+  }
+  .btn.primary:hover { background: #74a0f2; }
+  .btn.danger { color: var(--red); }
+  .btn .icon { font-size: 16px; }
+
+  .btn.focused {
+    outline: 2px solid var(--blue);
+    outline-offset: 1px;
+  }
+
+  /* === Lang switch === */
+  .lang-switch {
+    display: flex;
+    gap: 4px;
+    background: var(--surface0);
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid var(--surface1);
+  }
+  .lang-btn {
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    background: transparent;
+    color: var(--subtext);
+    border: none;
+    font-family: inherit;
+  }
+  .lang-btn.active {
+    background: var(--blue);
+    color: var(--base);
+    font-weight: 600;
+  }
+
+  /* === Grid === */
+  .grid {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+    min-height: 400px;
+    background: var(--base);
+  }
+
+  .thumbnail {
+    aspect-ratio: 1;
+    background: var(--surface0);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+  }
+  .thumbnail:hover {
+    border-color: var(--blue);
+    transform: translateY(-2px);
+  }
+  .thumbnail.focused {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+  }
+  .thumbnail .label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    color: white;
+    padding: 16px 8px 6px 8px;
+    font-size: 11px;
+    text-align: center;
+  }
+
+  /* === Status bar === */
+  .statusbar {
+    padding: 6px 16px;
+    background: var(--mantle);
+    border-top: 1px solid var(--surface0);
+    color: var(--subtext);
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .statusbar .status-icon { color: var(--green); }
+
+  /* === Empty state === */
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--subtext);
+  }
+  .empty-state .icon-big {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+  .empty-state h3 {
+    color: var(--text);
+    margin: 8px 0;
+    font-weight: 600;
+  }
+
+  /* === FullView dialog === */
+  .dialog {
+    background: var(--base);
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .dialog-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    background: var(--mantle);
+  }
+
+  .full-image {
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 4/3;
+    background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 55%, #ff99ac 100%);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+  }
+
+  .full-image.sepia {
+    background: linear-gradient(135deg, #d4a574 0%, #b8866b 55%, #c4926a 100%);
+    filter: sepia(0.7);
+  }
+
+  .dialog-actions {
+    display: flex;
+    gap: 10px;
+    padding: 16px 24px;
+    background: var(--base);
+    border-top: 1px solid var(--surface0);
+    justify-content: flex-end;
+  }
+
+  /* === A11y annotation === */
+  .a11y-note {
+    background: var(--surface0);
+    border-left: 3px solid var(--blue);
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 12px;
+    color: var(--subtext);
+    border-radius: 4px;
+  }
+  .a11y-note strong { color: var(--blue); }
+  .a11y-note code {
+    background: var(--mantle);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--green);
+    font-size: 11px;
+  }
+
+  /* === Keyboard hint === */
+  kbd {
+    background: var(--surface1);
+    color: var(--text);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: 'Inter', monospace;
+    border: 1px solid var(--surface2);
+  }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 900px) { .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<h1>PicGallery — UI Mockup</h1>
+<p class="lead">Visual reference untuk mini-project Fase 6. Skema warna Catppuccin Mocha (sama dengan <code>dark.qss</code>). Font Nunito (sesuai pilihan QRC lo).</p>
+
+<!-- ============================================ -->
+<!-- STATE 1: Empty state (just opened) -->
+<!-- ============================================ -->
+<div class="section-title">State 1 — Empty (baru dibuka)</div>
+
+<div class="window">
+  <div class="titlebar">
+    <div class="traffic"></div>
+    <div class="traffic yellow"></div>
+    <div class="traffic green"></div>
+    <div class="title">PicGallery</div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn primary focused" title="Pilih folder berisi foto (Alt+O)">
+      <span class="icon">📁</span> <u>O</u>pen Folder
+    </button>
+    <button class="btn" title="Tambah file foto satuan (Alt+A)">
+      <span class="icon">➕</span> <u>A</u>dd Files
+    </button>
+
+    <div class="toolbar-spacer"></div>
+
+    <div class="lang-switch" role="group" aria-label="Pilih bahasa">
+      <button class="lang-btn active" title="English (Alt+E)">🇬🇧 EN</button>
+      <button class="lang-btn" title="Bahasa Indonesia (Alt+I)">🇮🇩 ID</button>
+    </div>
+  </div>
+
+  <div class="empty-state">
+    <div class="icon-big">🖼️</div>
+    <h3>No photos yet</h3>
+    <p>Click <strong>Open Folder</strong> to load all photos from a directory,<br>
+       or <strong>Add Files</strong> to pick individual photos.</p>
+  </div>
+
+  <div class="statusbar">
+    <span><span class="status-icon">●</span> Ready</span>
+    <span>0 photos loaded</span>
+  </div>
+</div>
+
+<div class="a11y-note">
+  <strong>♿ A11y notes:</strong>
+  Default focus pada <strong>Open Folder</strong> (primary button). User bisa langsung tekan <kbd>Enter</kbd>.
+  Accelerator: <kbd>Alt</kbd>+<kbd>O</kbd> open folder, <kbd>Alt</kbd>+<kbd>A</kbd> add files, <kbd>Alt</kbd>+<kbd>E</kbd>/<kbd>I</kbd> ganti bahasa.
+  Tab order: Open Folder → Add Files → EN → ID.
+</div>
+
+
+<!-- ============================================ -->
+<!-- STATE 2: Loaded with photos -->
+<!-- ============================================ -->
+<div class="section-title">State 2 — Loaded (setelah pilih folder)</div>
+
+<div class="window">
+  <div class="titlebar">
+    <div class="traffic"></div>
+    <div class="traffic yellow"></div>
+    <div class="traffic green"></div>
+    <div class="title">PicGallery — Liburan Bali 2026</div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn">
+      <span class="icon">📁</span> <u>O</u>pen Folder
+    </button>
+    <button class="btn">
+      <span class="icon">➕</span> <u>A</u>dd Files
+    </button>
+    <button class="btn danger">
+      <span class="icon">🗑</span> Clear
+    </button>
+
+    <div class="toolbar-spacer"></div>
+
+    <div class="lang-switch">
+      <button class="lang-btn active">🇬🇧 EN</button>
+      <button class="lang-btn">🇮🇩 ID</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="thumbnail">🏖️<div class="label">beach.jpg</div></div>
+    <div class="thumbnail focused">🌅<div class="label">sunset.jpg</div></div>
+    <div class="thumbnail">🌴<div class="label">palm.jpg</div></div>
+    <div class="thumbnail">🐠<div class="label">snorkel.jpg</div></div>
+    <div class="thumbnail">🏝️<div class="label">island.jpg</div></div>
+    <div class="thumbnail">🍹<div class="label">drink.jpg</div></div>
+    <div class="thumbnail">🌊<div class="label">wave.jpg</div></div>
+    <div class="thumbnail">⛵<div class="label">boat.jpg</div></div>
+    <div class="thumbnail">🦀<div class="label">crab.jpg</div></div>
+    <div class="thumbnail">🦩<div class="label">flamingo.jpg</div></div>
+    <div class="thumbnail">🌺<div class="label">flower.jpg</div></div>
+    <div class="thumbnail">🥥<div class="label">coconut.jpg</div></div>
+  </div>
+
+  <div class="statusbar">
+    <span><span class="status-icon">✓</span> Folder loaded</span>
+    <span>12 photos · ~4.2 MB</span>
+  </div>
+</div>
+
+<div class="a11y-note">
+  <strong>♿ A11y notes:</strong>
+  Thumbnail yang sedang focus punya outline biru jelas (sunset.jpg di mockup).
+  <kbd>Tab</kbd> dari toolbar masuk ke grid; <kbd>Arrow keys</kbd> navigate antar thumbnail; <kbd>Enter</kbd> buka full view.
+  Setiap thumbnail punya <code>accessibleName</code> = nama file untuk screen reader.
+</div>
+
+
+<!-- ============================================ -->
+<!-- STATE 3: Bahasa Indonesia -->
+<!-- ============================================ -->
+<div class="section-title">State 3 — Switch ke Bahasa Indonesia</div>
+
+<div class="window">
+  <div class="titlebar">
+    <div class="traffic"></div>
+    <div class="traffic yellow"></div>
+    <div class="traffic green"></div>
+    <div class="title">PicGallery — Liburan Bali 2026</div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn">
+      <span class="icon">📁</span> <u>B</u>uka Folder
+    </button>
+    <button class="btn">
+      <span class="icon">➕</span> <u>T</u>ambah Berkas
+    </button>
+    <button class="btn danger">
+      <span class="icon">🗑</span> Bersihkan
+    </button>
+
+    <div class="toolbar-spacer"></div>
+
+    <div class="lang-switch">
+      <button class="lang-btn">🇬🇧 EN</button>
+      <button class="lang-btn active">🇮🇩 ID</button>
+    </div>
+  </div>
+
+  <div class="grid" style="min-height: 200px;">
+    <div class="thumbnail">🏖️<div class="label">beach.jpg</div></div>
+    <div class="thumbnail">🌅<div class="label">sunset.jpg</div></div>
+    <div class="thumbnail">🌴<div class="label">palm.jpg</div></div>
+    <div class="thumbnail">🐠<div class="label">snorkel.jpg</div></div>
+    <div class="thumbnail">🏝️<div class="label">island.jpg</div></div>
+    <div class="thumbnail">🍹<div class="label">drink.jpg</div></div>
+  </div>
+
+  <div class="statusbar">
+    <span><span class="status-icon">✓</span> Folder dimuat</span>
+    <span>12 foto · ~4,2 MB</span>
+  </div>
+</div>
+
+<div class="a11y-note">
+  <strong>♿ A11y + i18n:</strong>
+  Semua label berubah realtime tanpa restart (lewat <code>changeEvent(LanguageChange)</code> + <code>retranslateUi()</code>).
+  Accelerator juga berubah: <kbd>Alt</kbd>+<kbd>B</kbd> buka folder (B dari "Buka"), <kbd>Alt</kbd>+<kbd>T</kbd> tambah berkas.
+</div>
+
+
+<!-- ============================================ -->
+<!-- STATE 4: Full View Dialog (before sepia) -->
+<!-- ============================================ -->
+<div class="section-title">State 4 — Full View (klik thumbnail)</div>
+
+<div class="row">
+
+<div>
+<div style="text-align: center; font-size: 12px; color: var(--subtext); margin-bottom: 8px;">Original</div>
+<div class="dialog">
+  <div class="titlebar">
+    <div class="traffic"></div>
+    <div class="traffic yellow"></div>
+    <div class="traffic green"></div>
+    <div class="title">sunset.jpg</div>
+  </div>
+
+  <div class="dialog-body">
+    <div class="full-image">🌅</div>
+    <div style="color: var(--subtext); font-size: 12px;">1920 × 1080 · 824 KB</div>
+  </div>
+
+  <div class="dialog-actions">
+    <button class="btn" disabled style="opacity:0.5;">↺ Reset</button>
+    <button class="btn primary focused">
+      <span class="icon">🎨</span> Apply <u>S</u>epia
+    </button>
+    <button class="btn">
+      <u>C</u>lose
+    </button>
+  </div>
+</div>
+</div>
+
+<div>
+<div style="text-align: center; font-size: 12px; color: var(--subtext); margin-bottom: 8px;">After Sepia Filter</div>
+<div class="dialog">
+  <div class="titlebar">
+    <div class="traffic"></div>
+    <div class="traffic yellow"></div>
+    <div class="traffic green"></div>
+    <div class="title">sunset.jpg · Sepia applied</div>
+  </div>
+
+  <div class="dialog-body">
+    <div class="full-image sepia">🌅</div>
+    <div style="color: var(--green); font-size: 12px;">✓ Sepia filter applied</div>
+  </div>
+
+  <div class="dialog-actions">
+    <button class="btn focused">↺ <u>R</u>eset</button>
+    <button class="btn" disabled style="opacity:0.5;">
+      <span class="icon">🎨</span> Apply Sepia
+    </button>
+    <button class="btn">
+      <u>C</u>lose
+    </button>
+  </div>
+</div>
+</div>
+
+</div>
+
+<div class="a11y-note">
+  <strong>♿ Multi-modal feedback:</strong>
+  Status sepia gak cuma ditandai dengan warna gambar berubah —
+  tapi juga <strong>text</strong> ("Sepia filter applied"), <strong>icon ✓</strong>, dan <strong>title bar</strong> ("Sepia applied").
+  User color-blind atau screen reader tetap paham state berubah.
+  <br><br>
+  Tombol Reset di-disable saat belum apply sepia; Apply Sepia di-disable setelah applied — cegah double action.
+</div>
+
+
+<!-- ============================================ -->
+<!-- A11y reference -->
+<!-- ============================================ -->
+<div class="section-title">Keyboard navigation reference</div>
+
+<div class="window">
+<div style="padding: 20px;">
+<table style="width:100%; border-collapse: collapse;">
+<tr style="border-bottom: 1px solid var(--surface0);">
+  <th style="text-align: left; padding: 8px; color: var(--blue);">Shortcut</th>
+  <th style="text-align: left; padding: 8px; color: var(--blue);">Action</th>
+</tr>
+<tr><td style="padding: 6px 8px;"><kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>Navigate antar widget</td></tr>
+<tr><td style="padding: 6px 8px;"><kbd>Enter</kbd></td><td>Trigger default button (Open Folder atau Apply Sepia)</td></tr>
+<tr><td style="padding: 6px 8px;"><kbd>Alt</kbd>+<kbd>O</kbd></td><td>Open Folder</td></tr>
+<tr><td style="padding: 6px 8px;"><kbd>Alt</kbd>+<kbd>A</kbd></td><td>Add Files</td></tr>
+<tr><td style="padding: 6px 8px;"><kbd>Alt</kbd>+<kbd>E</kbd> / <kbd>Alt</kbd>+<kbd>I</kbd></td><td>Switch English / Indonesian</td></tr>
+<tr><td style="padding: 6px 8px;"><kbd>Arrow keys</kbd></td><td>Navigate thumbnail dalam grid</td></tr>
+<tr><td style="padding: 6px 8px;"><kbd>Enter</kbd> on thumbnail</td><td>Buka full view</td></tr>
+<tr><td style="padding: 6px 8px;"><kbd>Alt</kbd>+<kbd>S</kbd></td><td>Apply Sepia (di full view)</td></tr>
+<tr><td style="padding: 6px 8px;"><kbd>Alt</kbd>+<kbd>R</kbd></td><td>Reset image (di full view)</td></tr>
+<tr><td style="padding: 6px 8px;"><kbd>Alt</kbd>+<kbd>C</kbd> / <kbd>Esc</kbd></td><td>Close full view</td></tr>
+</table>
+</div>
+</div>
+
+<p style="margin-top: 32px; color: var(--subtext); font-size: 13px; text-align: center;">
+  💡 Buka file ini di browser untuk lihat visualisasi interaktif. Hover tombol untuk lihat tooltip.
+  <br>Gambar emoji = placeholder. Di app Qt asli, lo akan render <code>QPixmap</code> dari file foto sebenarnya.
+</p>
+
+</body>
+</html>
